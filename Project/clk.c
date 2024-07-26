@@ -16,7 +16,7 @@ if (RST_CLK_HSE2status() !=  SUCCESS){while(1);};
 
 RST_CLK_CPU_PLLcmd(ENABLE);
 if	(RST_CLK_CPU_PLLstatus() != SUCCESS) {while(1);}; 
-RST_CLK_CPU_PLLconfig(RST_CLK_CPU_PLLsrcHSEdiv1, RST_CLK_CPU_PLLmul9 );
+RST_CLK_CPU_PLLconfig(RST_CLK_CPU_PLLsrcHSEdiv1, RST_CLK_CPU_PLLmul1 );
 RST_CLK_CPU_PLLuse(ENABLE);
 
 RST_CLK_CPUclkSelection(RST_CLK_CPUclkCPU_C3);

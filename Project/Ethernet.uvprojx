@@ -429,6 +429,11 @@
               <FileType>1</FileType>
               <FilePath>.\tmr.c</FilePath>
             </File>
+            <File>
+              <FileName>tmr.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\tmr.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
