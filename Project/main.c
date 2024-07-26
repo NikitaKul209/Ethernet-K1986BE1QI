@@ -77,47 +77,20 @@ int main(void)
 
 
   set_clk();
-  set_port();
+//  set_port();
   set_ethernet();
 
-  ETH_SendFrame(  MDR_ETHERNET1,output_frame,42);
+
+	       ETH_SendFrame(  MDR_ETHERNET1,output_frame,42);
 	
   while(1)
     {
-//		void ETH_SendFrame(MDR_ETHERNET_TypeDef * ETHERNETx, uint32_t * ptr_OutputBuffer, uint32_t BufLen)
+			
 
-        ETH_SendFrame(  MDR_ETHERNET1,output_frame,45);
-      //
-      //
-      //	PORT_WriteBit(MDR_PORTB,PORT_Pin_0, SET);
-      //		PORT_WriteBit(MDR_PORTD,PORT_Pin_12, SET);
-
+		
     }
 
 
 
 }
 
-void ETHERNET_IRQHandler(void)
-{
-	uint16_t Status;
-	ETH_StatusPacketReceptionTypeDef packet;
-
-	// Flash LED1
-
-
-	// Get packet status and clear IT-flag
-	Status = ETH_GetMACITStatusRegister(MDR_ETHERNET1);
-
-	// Proccess valid ETH-packet
-	if( (MDR_ETHERNET1->ETH_R_Head != MDR_ETHERNET1->ETH_R_Tail) && (Status & ETH_MAC_IT_RF_OK) )
-	{
-		// Copy packet data into buffer
-		packet.Status = ETH_ReceivedFrame(MDR_ETHERNET1, output_frame);
-
-		// Unicast packet
-
-	}
-	NVIC_ClearPendingIRQ(ETHERNET_IRQn);
-}
-//====

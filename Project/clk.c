@@ -14,10 +14,10 @@ if (RST_CLK_HSEstatus() !=  SUCCESS)
 RST_CLK_HSE2config(RST_CLK_HSE2_ON);
 if (RST_CLK_HSE2status() !=  SUCCESS){while(1);};
 
-//RST_CLK_CPU_PLLcmd(ENABLE);
-//if	(RST_CLK_CPU_PLLstatus() != SUCCESS) {while(1);}; 
-//RST_CLK_CPU_PLLconfig(RST_CLK_CPU_PLLsrcHSEdiv1, RST_CLK_CPU_PLLmul2 );
-//RST_CLK_CPU_PLLuse(ENABLE);
+RST_CLK_CPU_PLLcmd(ENABLE);
+if	(RST_CLK_CPU_PLLstatus() != SUCCESS) {while(1);}; 
+RST_CLK_CPU_PLLconfig(RST_CLK_CPU_PLLsrcHSEdiv1, RST_CLK_CPU_PLLmul9 );
+RST_CLK_CPU_PLLuse(ENABLE);
 
 RST_CLK_CPUclkSelection(RST_CLK_CPUclkCPU_C3);
 RST_CLK_PCLKcmd(RST_CLK_PCLK_DMA,ENABLE);
@@ -39,6 +39,11 @@ UART_BRGInit(MDR_UART2, UART_HCLKdiv1);
 
 TIMER_BRGInit(MDR_TIMER1, TIMER_HCLKdiv1);
 TIMER_BRGInit(MDR_TIMER2, TIMER_HCLKdiv1);
+
+	/* Enables the RST_CLK_PCLK_EEPROM */
+	RST_CLK_PCLKcmd(RST_CLK_PCLK_EEPROM, ENABLE);
+	
+    /* Sets the code latency value */
 
 ETH_ClockDeInit();
 ETH_PHY_ClockConfig(ETH_PHY_CLOCK_SOURCE_HSE2 ,ETH_PHY_HCLKdiv1 );

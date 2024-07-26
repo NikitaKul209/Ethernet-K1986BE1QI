@@ -53,7 +53,7 @@
           <OutputName>Ethernet</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
-          <CreateHexFile>0</CreateHexFile>
+          <CreateHexFile>1</CreateHexFile>
           <DebugInformation>1</DebugInformation>
           <BrowseInformation>1</BrowseInformation>
           <ListingPath>.\Listings\</ListingPath>
@@ -212,7 +212,7 @@
             <Ra2Chk>0</Ra2Chk>
             <Ra3Chk>0</Ra3Chk>
             <Im1Chk>1</Im1Chk>
-            <Im2Chk>1</Im2Chk>
+            <Im2Chk>0</Im2Chk>
             <OnChipMemories>
               <Ocm1>
                 <Type>0</Type>
@@ -424,6 +424,11 @@
               <FileType>5</FileType>
               <FilePath>.\ethernet.h</FilePath>
             </File>
+            <File>
+              <FileName>tmr.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\tmr.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -452,6 +457,12 @@
         </targetInfos>
       </component>
       <component Cclass="Drivers" Cgroup="DMA" Cvendor="Keil" Cversion="2.0.3" condition="CON_MDR32F9">
+        <package name="MDR1986BExx" schemaVersion="1.2" url="https://ic.milandr.ru/soft/" vendor="Keil" version="2.0.3"/>
+        <targetInfos>
+          <targetInfo name="Target 1"/>
+        </targetInfos>
+      </component>
+      <component Cclass="Drivers" Cgroup="EEPROM" Cvendor="Keil" Cversion="2.0.3" condition="CON_MDR32F9">
         <package name="MDR1986BExx" schemaVersion="1.2" url="https://ic.milandr.ru/soft/" vendor="Keil" version="2.0.3"/>
         <targetInfos>
           <targetInfo name="Target 1"/>

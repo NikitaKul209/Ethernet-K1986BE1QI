@@ -21,8 +21,8 @@
 
 
 
-extern uint32_t output_frame [150];
-extern uint32_t input_frame [150];
+//extern uint32_t output_frame [150];
+//extern uint32_t input_frame [150];
 	
 
 
