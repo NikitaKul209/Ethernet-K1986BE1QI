@@ -15,8 +15,8 @@ void set_port(void){
 
   PortInit.PORT_FUNC = PORT_FUNC_PORT;
   PortInit.PORT_OE = PORT_OE_OUT;
-  PortInit.PORT_Pin = PORT_Pin_0;
-  PORT_Init(MDR_PORTB, &PortInit);
+  PortInit.PORT_Pin = PORT_Pin_9;
+  PORT_Init(MDR_PORTA, &PortInit);
 	
 	  PortInit.PORT_Pin = PORT_Pin_12;
 	  PORT_Init(MDR_PORTD, &PortInit);

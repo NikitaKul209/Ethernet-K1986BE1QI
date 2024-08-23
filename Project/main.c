@@ -2,16 +2,397 @@
 #include "main.h"
 #include "ethernet.h"
 
+
+
+
+
+
+
+
+
+
+
+// ????? ??? ??????????? ethernet
+#define ETH_RAM_BASE_ADDR	(unsigned int)0x38000000
+// ?????? ?????? ??? ethernet
+#define ETH_RAM_FULL_SIZE	8192	// ? ??????
+// ???????? ???
+#define ETH_RAM_HALF	(ETH_RAM_FULL_SIZE >> 1)
+// ?????? ??? ?????????
+#define ETH_RAM_SIZE_R	ETH_RAM_HALF
+// ?????? ??? ???????????
+#define ETH_RAM_SIZE_X	ETH_RAM_HALF
+// ?????? ?????? ??????? ????????? ? ???????????
+#define ETH_RAM_BASE_R		ETH_RAM_BASE_ADDR
+#define ETH_RAM_BASE_X		(ETH_RAM_BASE_ADDR + ETH_RAM_SIZE_R)
+
+
+
+
+#define FCLK		16							// частота генератора МГц
+extern unsigned int PLL_Mul;					// коэффициент умножения PLL
+#define CPU_CLK		(FCLK * (PLL_Mul + 1))
+#define	DELAY(d)	(FCLK * (PLL_Mul + 1) * (d) / 1000 + 1)	// FCLK * (PLL_Mul + 1) * d / 1000 + 1
+
+//---------------------------------------------------------------------------------------------------
+// полезные макро
+#define BM(n)		(1ul << (n))
+
+#define LOBYTE(w)         (unsigned char)(w)
+#define HIBYTE(w)         (unsigned char)((w) >> 8)
+#define MAKEWORD(lo, hi)  ((unsigned short)(unsigned char)(lo) | ((unsigned short)(unsigned char)(hi) << 8))
+
+#define HINIBBLE(b)			(((unsigned char)(b) & 0xF0) >> 4)
+#define LONIBBLE(b)			((unsigned int)(b) & 0x0F)
+
+#define EXCHANGE(a) (((unsigned short)(a) >> 8) | (((unsigned short)(a) & 0xFF) << 8))							 
+
+#define NO	((unsigned short)(-1))
+//---------------------------------------------------------------------------------------------------										
+#define PHY_ADDR			0x1C
+#define PHY_DEFAULT_MODE	PHY_MODE_10BaseT_FDn
+
+//------------------------------------------------------------
+// значение регистра задания предделителя шага изменения BAG и JitterWnd в мкс
+#define PSC_VAL(v)	(CPU_CLK * (v) - 1)
+// значение для регистра периода следования пакетов в мкс
+#define BAG_PERIOD(t)	(CPU_CLK * (t))
+// значение для регистра джиттера при передачи пакетов в мкс
+#define JITTER_WND(t)	(CPU_CLK * (t) - 1)
+
+// количество попыток обмена
+#define EXCH_ATTEMPT	10
+// размер окна коллизий
+#define COLL_WND		(1ul << 7)
+
+//------------------------------------------------------------
+//------------------------------------------------------------
+// определения для модуля PHY
+// регистр управления
+#define bPHY_BN_nRST				BM(0)
+
+#define PHY_CTRL_MODE				1
+#define mPHY_CTRL_MODE				(0x7ul << PHY_CTRL_MODE)
+
+#define bPHY_CTRL_FX_EN				BM(7)
+#define bPHY_CTRL_MDI				BM(8)
+#define bPHY_CTRL_MDIO_SEL			BM(9)
+#define bPHY_CTRL_MDC				BM(10)
+
+#define PHY_CTRL_PHYADD				11	
+#define mPHY_CTRL_PHYADD			(0x1Ful << PHY_CTRL_PHYADD)	
+
+// режимы работы
+enum{
+	PHY_MODE_10BaseT_HDn, 	// n - без автоподстройки
+	PHY_MODE_10BaseT_FDn,
+	PHY_MODE_100BaseT_HDn,
+	PHY_MODE_100BaseT_FDn,
+	PHY_MODE_100BaseT_HD,	
+	PHY_MODE_TRANSLATOR, 	// повторитель
+	PHY_MODE_LOW_CONS,		// пониженное потребление
+	PHY_MODE_AUTO,			// автоматический режим
+	PHY_MODE_CNT	
+};
+
+//------------------------------------------------------------
+// регистр состояния PHY
+#define bPHY_STAT_LED0		BM(0)	// 0 - 100Мбит, 1 - 10Мбит
+#define bPHY_STAT_LED1		BM(1)	// 0 - link вкл, 1 - link выкл
+#define bPHY_STAT_LED2		BM(2)	// 0 - наличие CRS, 1 - отсутствие CRS
+#define bPHY_STAT_LED3		BM(3)	// 0 - fill-duplex, 1 - half-duplex
+#define bPHY_STAT_READY		BM(4)	// 0 - не готов, 1 - готов
+#define bPHY_STAT_CRS		BM(5)	// 1 - выполняется обмен
+#define bPHY_STAT_COL		BM(6)	// 1 - коллизия
+#define bPHY_STAT_FX_VALID	BM(8)	// 1 - обмен в линии FX
+#define bPHY_STAT_MDO		BM(9)	// состояние выхода данных SMI для ручного управления 
+#define bPHY_STAT_MDINT		BM(10)	// прерывание от блока PHY
+
+//------------------------------------------------------------
+//------------------------------------------------------------
+// адрес ОЗУ контроллера ethernet
+#define ETH_RAM_BASE_ADDR	(unsigned int)0x38000000
+// полный размер ОЗУ ethernet
+#define ETH_RAM_FULL_SIZE	8192	// в байтах
+// половина ОЗУ
+#define ETH_RAM_HALF	(ETH_RAM_FULL_SIZE >> 1)
+// размер ОЗУ приемника
+#define ETH_RAM_SIZE_R	ETH_RAM_HALF
+// размер ОЗУ передатчика
+#define ETH_RAM_SIZE_X	ETH_RAM_HALF
+// адреса начала буферов приемника и передатчика
+#define ETH_RAM_BASE_R		ETH_RAM_BASE_ADDR
+#define ETH_RAM_BASE_X		(ETH_RAM_BASE_ADDR + ETH_RAM_SIZE_R)
+
+//------------------------------------------------------------
+//------------------------------------------------------------
+// Ethernet
+
+// регистр состояния передачи пакета
+// поле управления передачи пакета
+#define mETH_X_LENGTH		0xFFFFul
+// поле состояния передачи пакета
+#define ETH_X_STAT_RCNT		16
+#define mETH_X_STAT_RCNT	(0xFul << ETH_X_STAT_RCNT)
+// флаг исчерпания попыток передачи пакета
+#define bETH_X_STAT_RL		BM(20)
+// флаг индикации late collision во времы передачи пакета
+#define bETH_X_STAT_LC		BM(21)
+// флаг опустошения буфера передачи
+#define bETH_X_STAT_UR		BM(22)
+
+//------------------------------------------------------------
+// регистр состояния приема пакета
+// количество байт в пакете включая заголовок и CRC
+#define mETH_R_LENGTH		0xFFFFul
+// признак пакета PAUSE
+#define bETH_R_PF_ERR		BM(16)
+// признак пакета управления
+#define bETH_R_CF_ERR		BM(17)
+// признак превышения длины пакета 1518 октетов
+#define bETH_R_LF_ERR		BM(18)
+// признак недостаточной длинны пакета
+#define bETH_R_SF_ERR		BM(19)
+// признак несоответствия между реальной длинной и длинной 
+// указанной в поле длинны
+#define bETH_R_LEN_ERR		BM(20)
+// количество бит в пакете не кратно 8
+#define bETH_R_DN_ERR		BM(21)
+// признак несоответствия CRC пакета
+#define bETH_R_CRC_ERR		BM(22)
+// признак наличия в пакете ошибочных nibbles
+#define bETH_R_SMB_ERR		BM(23)
+// признак группового пакета
+#define bETH_R_MCA			BM(24)
+// признак широковещательного пакета
+#define bETH_R_BCA			BM(25)
+// признак индивидуального пакета
+#define bETH_R_UCA			BM(26)
+
+//------------------------------------------------------------
+// регистр общего управления блоком
+// размер окна коллизий
+#define mETH_CTRL_COL_WND	0xFFul
+// автоматическая обработка пакета PAUSE
+#define bETH_CTRL_PAUSE_EN	BM(8)
+// режим детерминированного времени доставки
+#define bETH_CTRL_DTRM_EN	BM(9)
+// полудуплексный режим работы
+#define bETH_CTRL_HD_EN		BM(10)
+// включение режима дополнения коротких пакетов ???
+#define bETH_CTRL_EXT_EN	BM(11)
+// режим работы буфера
+#define ETH_CTRL_BUFF_MODE	12
+// режимы работы
+enum{
+	BWM_LIN,	// линейный 
+	BWM_AUTO,	// автоматической изменение указателей
+	BWM_FIFO	
+};
+#define mETH_CTRL_BUFF_MODE	(0x3ul << ETH_CTRL_BUFF_MODE)
+// сброс передатчика ???
+#define bETH_CTRL_RCLR_EN	BM(14)	// сброс передатчика 1 - сброшен
+#define bETH_CTRL_XRST		BM(16)	// сброс передатчика 1 - сброшен
+// сброс приемника
+#define bETH_CTRL_RRST		BM(17)
+// режим КЗ
+#define bETH_CTRL_DLB		BM(18)
+// разрешение автоматического изменения указателей FIFO
+// приемника в режиме отладки
+#define bETH_CTRL_DBG_RF_EN	BM(28)
+// разрешение автоматического изменения указателей FIFO
+// передатчика
+#define bETH_CTRL_DBG_XF_EN	BM(29)
+// режим работы в режиме отладки
+#define ETH_DBG_MODE		30
+enum{
+	DBG_WM_FREERUN,
+	DBG_WM_HALT = 2,
+	DBG_WM_STOP
+};
+#define mETH_DBG_MODE		(0x3ul << ETH_DBG_MODE)
+
+//------------------------------------------------------------
+// регистр управления передатчиком
+// максимальное кол-во попыток обмена
+#define mETH_X_CFG_RTRY_CNT		0xFul
+// выдержка паузы между отправкой пакетов
+#define bETH_X_CFG_IPG_EN		BM(4)
+// дополнение пакета автоматически высчитанным CRC 
+#define bETH_X_CFG_CRC_EN		BM(5)
+// дополненение пакета преамбулой
+#define bETH_X_CFG_PRE_EN		BM(6)
+// дополнение пакета до минимальной длинны PAD-ами
+#define bETH_X_CFG_PAD_EN		BM(7)
+// выбор режима работы вывода EVNT[1]
+#define ETH_X_CFG_EVNT_MODE		8
+enum{
+	EVNT_MODE_XFIFO_EMPTY,		// пуст
+	EVNT_MODE_XFIFO_NEAR_EMPTY,	// почти пуст	
+	EVNT_MODE_XFIFO_HALF,		// полон на половину
+	EVNT_MODE_XFIFO_NEAR_FULL,	// почти полон	
+	EVNT_MODE_XFIFO_FULL,		// полон	
+	EVNT_MODE_XFIFO_SND_FNSH, 	// отправка завершена
+	EVNT_MODE_XFIFO_READ_WORD_FROM_BUF,	// считал слово данных из буфера
+	EVNT_MODE_XFIFO_NEXT_ATTM	// очередная попятка передачи пакета
+};
+#define mETH_X_CFG_EVNT_MODE	(0x7ul << ETH_X_CFG_EVNT_MODE)
+// порядок следования бит при передачи байтов данных
+#define bETH_X_CGF_MSB1ST		BM(12) // 0 - LSB, 1 - MSB
+// порядок следования байт
+#define bETH_X_CFG_BE			BM(14)	// 0 - little endian, 1 - big endian
+// разрешение работы передатчика
+#define bETH_X_CFG_EN			BM(15)
+
+//------------------------------------------------------------
+// регистр управления приемником
+// прием пакетов с групповым MAC-адресом, с фильтрацией по HASH таблице
+#define bETH_R_CFG_MCA_EN		BM(0)
+// прием пакетов с широковещательным MAC
+#define bETH_R_CFG_BCA_EN		BM(1)
+// прием пакетов с MAC	указанным в регистре MAC_Address
+#define bETH_R_CFG_UCA_EN		BM(2)
+// прием пакетов без фильтрации MAC
+#define bETH_R_CFG_AC_EN		BM(3)
+// разрешение приема пакетов с ошибками 
+#define bETH_R_CFG_EF_EN		BM(4)
+// разрешение приема управляющих пакетов
+#define bETH_R_CFG_CF_EN		BM(5)
+// разрешение приема пакетов длинной больше максимальной
+#define bETH_R_CFG_LF_EN		BM(6)
+// разрешение приема пакетов длинной меньше минимальной
+#define bETH_R_CFG_SF_EN		BM(7)
+
+// выбор режима работы вывода EVNT[1]
+#define ETH_R_CFG_EVNT_MODE		8
+enum{
+	EVNT_MODE_RFIFO_NO_EMPTY,		// не пуст
+	EVNT_MODE_RFIFO_NEAR_NO_EMPTY,	// почти не пуст	
+	EVNT_MODE_RFIFO_HALF,		// пуст на половину
+	EVNT_MODE_RFIFO_NEAR_NO_FULL,	// почти не полон	
+	EVNT_MODE_RFIFO_NO_FULL,		// не полон	
+	EVNT_MODE_RFIFO_RCV_FNSH, 	// прием завершен
+	EVNT_MODE_RFIFO_WRITE_WORD_TO_BUF,	// положил данные в буфер
+	EVNT_MODE_RFIFO_KICK		// отбросил пакет
+};
+#define mETH_R_CFG_EVNT_MODE	(0x7ul << ETH_R_CFG_EVNT_MODE)
+// порядок следования бит при приеме байтов данных
+#define bETH_R_CGF_MSB1ST		BM(12) // 0 - LSB, 1 - MSB
+// порядок следования байт
+#define bETH_R_CFG_BE			BM(14)	// 0 - little endian, 1 - big endian
+// разрешение работы приемника
+#define bETH_R_CFG_EN			BM(15)
+
+//------------------------------------------------------------
+// регистр маски IMR и флагов IFR прерываний 
+// индикатор успешно принятого пакета
+#define bETH_IMR_RF_OK			BM(0)
+#define bETH_IFR_RF_OK			bETH_IMR_RF_OK			
+// потеря пакета из-за отсутствия места в буфере
+#define bETH_IMR_MISSED_F		BM(1)
+#define bETH_IFR_MISSED_F		bETH_IMR_MISSED_F
+// переполнение буфера приемника
+#define bETH_IMR_OVF			BM(2)
+#define bETH_IFR_OVF			bETH_IMR_OVF			
+// наличие ошибок в данных при приеме пакета
+#define bETH_IMR_SMB_ERR		BM(3)
+#define bETH_IFR_SMB_ERR		bETH_IMR_SMB_ERR		
+// несовпадение CRC пакета принятых данных с CRC пакета
+#define bETH_IMR_CRC_ERR		BM(4)
+#define bETH_IFR_CRC_ERR		bETH_IMR_CRC_ERR		
+// прием управляющих пакетов
+#define bETH_IMR_CF				BM(5)
+#define bETH_IFR_CF				bETH_IMR_CF
+// пакет длинны более максимальной
+#define bETH_IMR_LF				BM(6)
+#define bETH_IFR_LF				bETH_IMR_LF
+// пакет длинны менее минимальной
+#define bETH_IMR_SF				BM(7)
+#define bETH_IFR_SF				bETH_IMR_SF
+//  успешная отправка пакета
+#define bETH_IMR_XF_OK			BM(8)
+#define bETH_IFR_XF_OK			bETH_IMR_XF_OK
+// наличие ошибок при передаче пакета
+#define bETH_IMR_XF_ERR			BM(9)
+#define bETH_IFR_XF_ERR			bETH_IMR_XF_ERR
+// опустошение буфера передатчика
+#define bETH_IMR_UNDF			BM(10)
+#define bETH_IFR_UNDF			bETH_IMR_UNDF
+// наличие late collision в линии
+#define bETH_IMR_LC				BM(11)
+#define bETH_IFR_LC				bETH_IMR_LC				
+// потеря несущей во время передачи в полудуплексном режиме
+#define bETH_IMR_CRS_LOST		BM(12)
+#define bETH_IFR_CRS_LOST		bETH_IMR_CRS_LOST		
+// прерывание по MDIO интерфейсу
+#define bETH_IMR_MDIO_INT		BM(14)
+#define bETH_IFR_MDIO_INT		bETH_IMR_MDIO_INT
+// завершение текущей команжы по MDIO интерфейсу
+#define bETH_IMR_MII_RDY		BM(15)
+#define bETH_IFR_MII_RDY		bETH_IMR_MII_RDY
+
+//------------------------------------------------------------
+// регистр статуса
+// буфер приемника пуст
+#define	bETH_STAT_R_EMPTY		BM(0)
+// буфер приемника почти пуст
+#define	bETH_STAT_R_AEMPTY		BM(1)
+// буфер приемника полуполон
+#define	bETH_STAT_R_HALF		BM(2)
+ // буфер приемника почти полон
+#define	bETH_STAT_R_AFULL		BM(3)
+ //  буфер приемника полон
+#define	bETH_STAT_R_FULL		BM(4)
+
+// количество принятых, но не считанных пакетов
+#define	ETH_STAT_R_CNT			5
+#define	mETH_STAT_R_CNT			(0x7ul << ETH_STAT_R_CNT)
+
+// буфер передатчика пуст
+#define bETH_STAT_X_EMPTY		BM(8)
+// буфер передатчика почти пуст
+#define bETH_STAT_X_AEMPTY		BM(9)
+// буфер передатчика полуполон
+#define bETH_STAT_X_HALF		BM(10)
+// буфер передатчика почти полон
+#define bETH_STAT_X_AFULL		BM(11)
+// буфер передатчика полон
+#define bETH_STAT_X_FULL		BM(12)
+
+//------------------------------------------------------------
+// регистр управления MDIO
+// номер регистра PHY
+#define mETH_PHY_MDIO_REG			0x1Ful
+// коэффициент деления основной частоты для MDIO
+#define ETH_PHY_MDIO_DIV			5
+#define mETH_PHY_MDIO_DIV			(0x7ul << ETH_PHY_MDIO_DIV)
+// адрес модуля
+#define ETH_PHY_MDIO_ADDR			5
+#define mETH_PHY_MDIO_ADDR			(0x1Ful << ETH_PHY_MDIO_ADDR)
+// операция
+#define bETH_PHY_MDIO_OP			BM(13)	// 1 - rd, 0 - wr
+// режим передачи
+#define bETH_PHY_MDIO_PRE_EN		BM(14)	// 1 -  с преамбулой
+// управление/индикатор обмена по MDIO
+#define bETH_PHY_MDIO_RDY			BM(15)
+
+unsigned int CalcSum(void* buf, unsigned int size);
+unsigned short CalcHeaderCS(void* buf, unsigned int size);
+
+
+
 extern uint8_t DA_MAC_Address[6];
 extern uint8_t SA_MAC_Address[6];
 extern uint8_t SA_IP_Address[6];
 extern uint8_t DA_IP_Address[6];
-uint32_t output_frame [150] ;
-//  uint32_t input_frame [150];
+uint8_t output_frame [1500] ;
+uint8_t bufflen = 42;
+//  uint32_t input_frame [1500];
 bool  timer_flag = false;
 int main(void)
 {
-
+unsigned int ethernet_WriteRAM(void* buf, unsigned int size);
+	
   output_frame[0] = 0xff;
   output_frame[1] = 0xff;
   output_frame[2] = 0xff;
@@ -78,24 +459,44 @@ int main(void)
 
   set_clk();
 		set_timer();
-//  set_port();
-  set_ethernet();
-;
-  NVIC_EnableIRQ(TIMER1_IRQn );
-  TIMER_Cmd(MDR_TIMER1, ENABLE);
-            TIMER_SetCounter(MDR_TIMER1,0x0);
+  set_port();
+//  set_ethernet();
+//	NVIC_EnableIRQ(ETHERNET_IRQn);	
+//	Ethernet_Init();
+	
+	
 
 
+  NVIC_EnableIRQ(TIMER2_IRQn );
+
+	  TIMER_ClearITPendingBit(MDR_TIMER2, TIMER_STATUS_CNT_ARR);
+		  TIMER_SetCounter(MDR_TIMER2,0x0);
+  TIMER_Cmd(MDR_TIMER2, ENABLE);
+
+//			ethernet_WriteRAM(output_frame,42);
+//			ETH_SendFrame(MDR_ETHERNET1, output_frame,42);
+//PORT_WriteBit(MDR_PORTA, PORT_Pin_9,true);
+	uint8_t val = 0;
   while(1)
     {
-
-      if(timer_flag)
+		
+			   if(timer_flag)
         {
+				
+//					= PORT_ReadInputDataBit(MDR_PORTA,PORT_Pin_9);
+					val = ~val;
+		
+					PORT_WriteBit(MDR_PORTA, PORT_Pin_9,val);
           timer_flag = false;
-          ETH_SendFrame(  MDR_ETHERNET1,output_frame,42);
-					TIMER_Cmd(MDR_TIMER1, ENABLE);
+//          ETH_SendFrame(  MDR_ETHERNET1,output_frame,bufflen);
+//					ethernet_WriteRAM(output_frame,42);
+					TIMER_Cmd(MDR_TIMER2, ENABLE);
 
         }
+			
+			
+			
+   
 
     }
 
@@ -103,13 +504,95 @@ int main(void)
 
 }
 
-void TIMER1_IRQHandler(void)
+void TIMER2_IRQHandler(void)
 {
-  if (TIMER_GetITStatus(MDR_TIMER1, TIMER_STATUS_CNT_ARR))
+  if (TIMER_GetITStatus(MDR_TIMER2, TIMER_STATUS_CNT_ARR))
     {
-      TIMER_ClearITPendingBit(MDR_TIMER1, TIMER_STATUS_CNT_ARR);
-      TIMER_Cmd(MDR_TIMER1, DISABLE);
-      TIMER_SetCounter(MDR_TIMER1,0x0);
+      TIMER_ClearITPendingBit(MDR_TIMER2, TIMER_STATUS_CNT_ARR);
+      TIMER_Cmd(MDR_TIMER2, DISABLE);
+      TIMER_SetCounter(MDR_TIMER2,0x0);
       timer_flag = true;
     }
+}
+
+void ETHERNET_Handler(void)
+{		
+	// ????? ??????????
+	unsigned int intr = MDR_ETHERNET1->ETH_IFR;		
+	MDR_ETHERNET1->ETH_IFR = intr;
+}
+
+
+
+
+unsigned int ethernet_WriteRAM(void* buf, unsigned int size)
+{	
+	unsigned int head, tail;	// ????? ??????, ??????? ?????? ? ?????? ?????? ???????, ? ???
+	unsigned short tmp[2];
+	unsigned int tmp32;
+	unsigned int* src; 
+	unsigned int* dst;
+	unsigned short i;	
+	
+	head = 	MDR_ETHERNET1->ETH_X_Head;	// 
+	tail = MDR_ETHERNET1->ETH_X_Tail;	//	
+
+	// ?????????? ????????? ???? ? ?????? ???????????
+	if(head > tail){			
+		tmp[0] = head - tail;
+		tmp[1] = 0;	
+	}
+	else{		
+		tmp[0] = ETH_RAM_FULL_SIZE - tail;
+		tmp[1] = head - ETH_RAM_SIZE_X;
+	}					
+
+	// ???? ????? ? ?????? ??????, ??? ?? ????? ????????(? ?????? 2-? ??????? ???? ??????????)
+	if(size > (tmp[0] + tmp[1] - 2 * sizeof(unsigned int))){				
+		return 0;			
+	}
+
+	tmp32 = size;
+
+	src = buf;
+	dst = (unsigned int*)(ETH_RAM_BASE_ADDR + tail); //??? ???????????		
+
+	*dst++ = tmp32;
+	tmp[0] -= sizeof(unsigned int);
+
+	if(dst >= (unsigned int*)(ETH_RAM_BASE_ADDR + ETH_RAM_FULL_SIZE))
+		dst = (unsigned int*)ETH_RAM_BASE_X;
+	
+
+	tmp32 = (size + sizeof(unsigned int) - 1)/sizeof(unsigned int);	
+
+	if(size <= tmp[0]){		
+		for(i = 0; i < tmp32; i++){
+			*dst++ = *src++;			
+		}						
+	}	
+	else{				
+		tmp32 -= tmp[0]/sizeof(unsigned int);
+			
+		for(i = 0; i < tmp[0]/sizeof(unsigned int); i++)
+			*dst++ = *src++;
+		dst = (unsigned int*)ETH_RAM_BASE_X;
+		for(i = 0; i < tmp32; i++)
+			*dst++ = *src++;		
+	}	
+	
+	if(dst >= (unsigned int*)(ETH_RAM_BASE_ADDR + ETH_RAM_FULL_SIZE)){		
+		dst = (unsigned int*)ETH_RAM_BASE_X;
+	}
+
+	tmp32 = 0;	
+	*dst++ = tmp32;	
+
+	if(dst >= (unsigned int*)(ETH_RAM_BASE_ADDR + ETH_RAM_FULL_SIZE)){	
+		dst = (unsigned int*)ETH_RAM_BASE_X;
+	}
+		
+	MDR_ETHERNET1->ETH_X_Tail = (unsigned int)dst;								
+	MDR_PORTA->RXTX ^= (1 << 13);
+	return size;
 }
