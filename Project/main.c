@@ -45,10 +45,10 @@ extern unsigned int PLL_Mul;					// коэффициент умножения PLL
 #define HINIBBLE(b)			(((unsigned char)(b) & 0xF0) >> 4)
 #define LONIBBLE(b)			((unsigned int)(b) & 0x0F)
 
-#define EXCHANGE(a) (((unsigned short)(a) >> 8) | (((unsigned short)(a) & 0xFF) << 8))							 
+#define EXCHANGE(a) (((unsigned short)(a) >> 8) | (((unsigned short)(a) & 0xFF) << 8))
 
 #define NO	((unsigned short)(-1))
-//---------------------------------------------------------------------------------------------------										
+//---------------------------------------------------------------------------------------------------
 #define PHY_ADDR			0x1C
 #define PHY_DEFAULT_MODE	PHY_MODE_10BaseT_FDn
 
@@ -79,20 +79,21 @@ extern unsigned int PLL_Mul;					// коэффициент умножения PLL
 #define bPHY_CTRL_MDIO_SEL			BM(9)
 #define bPHY_CTRL_MDC				BM(10)
 
-#define PHY_CTRL_PHYADD				11	
-#define mPHY_CTRL_PHYADD			(0x1Ful << PHY_CTRL_PHYADD)	
+#define PHY_CTRL_PHYADD				11
+#define mPHY_CTRL_PHYADD			(0x1Ful << PHY_CTRL_PHYADD)
 
 // режимы работы
-enum{
-	PHY_MODE_10BaseT_HDn, 	// n - без автоподстройки
-	PHY_MODE_10BaseT_FDn,
-	PHY_MODE_100BaseT_HDn,
-	PHY_MODE_100BaseT_FDn,
-	PHY_MODE_100BaseT_HD,	
-	PHY_MODE_TRANSLATOR, 	// повторитель
-	PHY_MODE_LOW_CONS,		// пониженное потребление
-	PHY_MODE_AUTO,			// автоматический режим
-	PHY_MODE_CNT	
+enum
+{
+  PHY_MODE_10BaseT_HDn, 	// n - без автоподстройки
+  PHY_MODE_10BaseT_FDn,
+  PHY_MODE_100BaseT_HDn,
+  PHY_MODE_100BaseT_FDn,
+  PHY_MODE_100BaseT_HD,
+  PHY_MODE_TRANSLATOR, 	// повторитель
+  PHY_MODE_LOW_CONS,		// пониженное потребление
+  PHY_MODE_AUTO,			// автоматический режим
+  PHY_MODE_CNT
 };
 
 //------------------------------------------------------------
@@ -153,7 +154,7 @@ enum{
 #define bETH_R_LF_ERR		BM(18)
 // признак недостаточной длинны пакета
 #define bETH_R_SF_ERR		BM(19)
-// признак несоответствия между реальной длинной и длинной 
+// признак несоответствия между реальной длинной и длинной
 // указанной в поле длинны
 #define bETH_R_LEN_ERR		BM(20)
 // количество бит в пакете не кратно 8
@@ -184,10 +185,11 @@ enum{
 // режим работы буфера
 #define ETH_CTRL_BUFF_MODE	12
 // режимы работы
-enum{
-	BWM_LIN,	// линейный 
-	BWM_AUTO,	// автоматической изменение указателей
-	BWM_FIFO	
+enum
+{
+  BWM_LIN,	// линейный
+  BWM_AUTO,	// автоматической изменение указателей
+  BWM_FIFO
 };
 #define mETH_CTRL_BUFF_MODE	(0x3ul << ETH_CTRL_BUFF_MODE)
 // сброс передатчика ???
@@ -205,10 +207,11 @@ enum{
 #define bETH_CTRL_DBG_XF_EN	BM(29)
 // режим работы в режиме отладки
 #define ETH_DBG_MODE		30
-enum{
-	DBG_WM_FREERUN,
-	DBG_WM_HALT = 2,
-	DBG_WM_STOP
+enum
+{
+  DBG_WM_FREERUN,
+  DBG_WM_HALT = 2,
+  DBG_WM_STOP
 };
 #define mETH_DBG_MODE		(0x3ul << ETH_DBG_MODE)
 
@@ -218,7 +221,7 @@ enum{
 #define mETH_X_CFG_RTRY_CNT		0xFul
 // выдержка паузы между отправкой пакетов
 #define bETH_X_CFG_IPG_EN		BM(4)
-// дополнение пакета автоматически высчитанным CRC 
+// дополнение пакета автоматически высчитанным CRC
 #define bETH_X_CFG_CRC_EN		BM(5)
 // дополненение пакета преамбулой
 #define bETH_X_CFG_PRE_EN		BM(6)
@@ -226,15 +229,16 @@ enum{
 #define bETH_X_CFG_PAD_EN		BM(7)
 // выбор режима работы вывода EVNT[1]
 #define ETH_X_CFG_EVNT_MODE		8
-enum{
-	EVNT_MODE_XFIFO_EMPTY,		// пуст
-	EVNT_MODE_XFIFO_NEAR_EMPTY,	// почти пуст	
-	EVNT_MODE_XFIFO_HALF,		// полон на половину
-	EVNT_MODE_XFIFO_NEAR_FULL,	// почти полон	
-	EVNT_MODE_XFIFO_FULL,		// полон	
-	EVNT_MODE_XFIFO_SND_FNSH, 	// отправка завершена
-	EVNT_MODE_XFIFO_READ_WORD_FROM_BUF,	// считал слово данных из буфера
-	EVNT_MODE_XFIFO_NEXT_ATTM	// очередная попятка передачи пакета
+enum
+{
+  EVNT_MODE_XFIFO_EMPTY,		// пуст
+  EVNT_MODE_XFIFO_NEAR_EMPTY,	// почти пуст
+  EVNT_MODE_XFIFO_HALF,		// полон на половину
+  EVNT_MODE_XFIFO_NEAR_FULL,	// почти полон
+  EVNT_MODE_XFIFO_FULL,		// полон
+  EVNT_MODE_XFIFO_SND_FNSH, 	// отправка завершена
+  EVNT_MODE_XFIFO_READ_WORD_FROM_BUF,	// считал слово данных из буфера
+  EVNT_MODE_XFIFO_NEXT_ATTM	// очередная попятка передачи пакета
 };
 #define mETH_X_CFG_EVNT_MODE	(0x7ul << ETH_X_CFG_EVNT_MODE)
 // порядок следования бит при передачи байтов данных
@@ -254,7 +258,7 @@ enum{
 #define bETH_R_CFG_UCA_EN		BM(2)
 // прием пакетов без фильтрации MAC
 #define bETH_R_CFG_AC_EN		BM(3)
-// разрешение приема пакетов с ошибками 
+// разрешение приема пакетов с ошибками
 #define bETH_R_CFG_EF_EN		BM(4)
 // разрешение приема управляющих пакетов
 #define bETH_R_CFG_CF_EN		BM(5)
@@ -265,15 +269,16 @@ enum{
 
 // выбор режима работы вывода EVNT[1]
 #define ETH_R_CFG_EVNT_MODE		8
-enum{
-	EVNT_MODE_RFIFO_NO_EMPTY,		// не пуст
-	EVNT_MODE_RFIFO_NEAR_NO_EMPTY,	// почти не пуст	
-	EVNT_MODE_RFIFO_HALF,		// пуст на половину
-	EVNT_MODE_RFIFO_NEAR_NO_FULL,	// почти не полон	
-	EVNT_MODE_RFIFO_NO_FULL,		// не полон	
-	EVNT_MODE_RFIFO_RCV_FNSH, 	// прием завершен
-	EVNT_MODE_RFIFO_WRITE_WORD_TO_BUF,	// положил данные в буфер
-	EVNT_MODE_RFIFO_KICK		// отбросил пакет
+enum
+{
+  EVNT_MODE_RFIFO_NO_EMPTY,		// не пуст
+  EVNT_MODE_RFIFO_NEAR_NO_EMPTY,	// почти не пуст
+  EVNT_MODE_RFIFO_HALF,		// пуст на половину
+  EVNT_MODE_RFIFO_NEAR_NO_FULL,	// почти не полон
+  EVNT_MODE_RFIFO_NO_FULL,		// не полон
+  EVNT_MODE_RFIFO_RCV_FNSH, 	// прием завершен
+  EVNT_MODE_RFIFO_WRITE_WORD_TO_BUF,	// положил данные в буфер
+  EVNT_MODE_RFIFO_KICK		// отбросил пакет
 };
 #define mETH_R_CFG_EVNT_MODE	(0x7ul << ETH_R_CFG_EVNT_MODE)
 // порядок следования бит при приеме байтов данных
@@ -284,22 +289,22 @@ enum{
 #define bETH_R_CFG_EN			BM(15)
 
 //------------------------------------------------------------
-// регистр маски IMR и флагов IFR прерываний 
+// регистр маски IMR и флагов IFR прерываний
 // индикатор успешно принятого пакета
 #define bETH_IMR_RF_OK			BM(0)
-#define bETH_IFR_RF_OK			bETH_IMR_RF_OK			
+#define bETH_IFR_RF_OK			bETH_IMR_RF_OK
 // потеря пакета из-за отсутствия места в буфере
 #define bETH_IMR_MISSED_F		BM(1)
 #define bETH_IFR_MISSED_F		bETH_IMR_MISSED_F
 // переполнение буфера приемника
 #define bETH_IMR_OVF			BM(2)
-#define bETH_IFR_OVF			bETH_IMR_OVF			
+#define bETH_IFR_OVF			bETH_IMR_OVF
 // наличие ошибок в данных при приеме пакета
 #define bETH_IMR_SMB_ERR		BM(3)
-#define bETH_IFR_SMB_ERR		bETH_IMR_SMB_ERR		
+#define bETH_IFR_SMB_ERR		bETH_IMR_SMB_ERR
 // несовпадение CRC пакета принятых данных с CRC пакета
 #define bETH_IMR_CRC_ERR		BM(4)
-#define bETH_IFR_CRC_ERR		bETH_IMR_CRC_ERR		
+#define bETH_IFR_CRC_ERR		bETH_IMR_CRC_ERR
 // прием управляющих пакетов
 #define bETH_IMR_CF				BM(5)
 #define bETH_IFR_CF				bETH_IMR_CF
@@ -320,10 +325,10 @@ enum{
 #define bETH_IFR_UNDF			bETH_IMR_UNDF
 // наличие late collision в линии
 #define bETH_IMR_LC				BM(11)
-#define bETH_IFR_LC				bETH_IMR_LC				
+#define bETH_IFR_LC				bETH_IMR_LC
 // потеря несущей во время передачи в полудуплексном режиме
 #define bETH_IMR_CRS_LOST		BM(12)
-#define bETH_IFR_CRS_LOST		bETH_IMR_CRS_LOST		
+#define bETH_IFR_CRS_LOST		bETH_IMR_CRS_LOST
 // прерывание по MDIO интерфейсу
 #define bETH_IMR_MDIO_INT		BM(14)
 #define bETH_IFR_MDIO_INT		bETH_IMR_MDIO_INT
@@ -339,9 +344,9 @@ enum{
 #define	bETH_STAT_R_AEMPTY		BM(1)
 // буфер приемника полуполон
 #define	bETH_STAT_R_HALF		BM(2)
- // буфер приемника почти полон
+// буфер приемника почти полон
 #define	bETH_STAT_R_AFULL		BM(3)
- //  буфер приемника полон
+//  буфер приемника полон
 #define	bETH_STAT_R_FULL		BM(4)
 
 // количество принятых, но не считанных пакетов
@@ -380,38 +385,118 @@ unsigned int CalcSum(void* buf, unsigned int size);
 unsigned short CalcHeaderCS(void* buf, unsigned int size);
 
 
-
 extern uint8_t DA_MAC_Address[6];
 extern uint8_t SA_MAC_Address[6];
 extern uint8_t SA_IP_Address[6];
 extern uint8_t DA_IP_Address[6];
 uint8_t output_frame [1500] ;
+uint32_t input_frame [1500] ;
 uint8_t bufflen = 42;
+unsigned int ethernet_WriteRAM(void* buf, unsigned int size);
+
+void ARP_REQUEST(void);
 //  uint32_t input_frame [1500];
 bool  timer_flag = false;
 int main(void)
 {
-unsigned int ethernet_WriteRAM(void* buf, unsigned int size);
-	
-  output_frame[0] = 0xff;
-  output_frame[1] = 0xff;
-  output_frame[2] = 0xff;
-  output_frame[3] = 0xff;
-  output_frame[4] = 0xff;
-  output_frame[5] = 0xff;
-//  output_frame[0] = DA_MAC_Address[0];
-//  output_frame[1] = DA_MAC_Address[1];
-//  output_frame[2] = DA_MAC_Address[2];
-//  output_frame[3] = DA_MAC_Address[3];
-//  output_frame[4] = DA_MAC_Address[4];
-//  output_frame[5] = DA_MAC_Address[5];
 
-  output_frame[6] = SA_MAC_Address[0];
-  output_frame[7] = SA_MAC_Address[1];
-  output_frame[8] = SA_MAC_Address[2];
-  output_frame[9] = SA_MAC_Address[3];
-  output_frame[10] = SA_MAC_Address[4];
-  output_frame[11] = SA_MAC_Address[5];
+
+
+
+
+
+  set_clk();
+  set_timer();
+  set_port();
+//  set_ethernet();
+  NVIC_EnableIRQ(ETHERNET_IRQn);
+  Ethernet_Init();
+
+
+
+
+  NVIC_EnableIRQ(TIMER2_IRQn );
+
+  TIMER_ClearITPendingBit(MDR_TIMER2, TIMER_STATUS_CNT_ARR);
+  TIMER_SetCounter(MDR_TIMER2,0x0);
+  TIMER_Cmd(MDR_TIMER2, ENABLE);
+
+//PORT_WriteBit(MDR_PORTA, PORT_Pin_9,true);
+  uint8_t val = 0;
+  while(1)
+    {
+
+      if(timer_flag)
+        {
+
+          val = ~val;
+          PORT_ResetBits(MDR_PORTC,PORT_Pin_9);
+          PORT_WriteBit(MDR_PORTA, PORT_Pin_9,val);
+          timer_flag = false;
+          ARP_REQUEST();
+          TIMER_Cmd(MDR_TIMER2, ENABLE);
+
+        }
+
+
+
+
+
+    }
+
+
+
+}
+
+
+
+PING_ECHO()
+{
+
+
+
+//eth
+  memcpy(&output_frame[0],DA_MAC_Address,6);
+  memcpy(&output_frame[6],SA_MAC_Address,6);
+  output_frame[12] = 0x8;
+  output_frame[13] = 0x0;
+
+//ip
+  output_frame[14] = 0x45;
+  output_frame[15] = 0x0;
+  output_frame[16] = 0x00;
+  output_frame[17] = 0x3C;
+
+  output_frame[18] = 0xfe;
+  output_frame[19] = 0x7d;
+
+  output_frame[20] = 0x0;
+  output_frame[21] = 0x0;
+
+  output_frame[22] = 0x80;
+  output_frame[23] = 0x01;
+
+  output_frame[24] = 0x0;
+  output_frame[25] = 0x0;
+  memcpy(&output_frame[26],SA_IP_Address,4);
+  memcpy(&output_frame[30],DA_IP_Address,4);
+
+//icmp
+  output_frame[34] = 0x0;
+  output_frame[35] = 0x0;
+
+  output_frame[36] = 0x0;//crc
+  output_frame[37] = 0x0;//crc
+
+  output_frame[38] = 0xfe;
+  output_frame[39] = 0x7d;
+}
+
+void ARP_REQUEST(void)
+{
+
+  memset(output_frame,0xff,0x6);
+  memcpy(&output_frame[6],SA_MAC_Address,6);
 
   output_frame[12] = 0x8;
   output_frame[13] = 0x6;
@@ -429,77 +514,12 @@ unsigned int ethernet_WriteRAM(void* buf, unsigned int size);
   output_frame[20] = 0x00;
   output_frame[21] = 0x01;
 
-  output_frame[22] = SA_MAC_Address[0];
-  output_frame[23] = SA_MAC_Address[1];
-  output_frame[24] = SA_MAC_Address[2];
-  output_frame[25] = SA_MAC_Address[3];
-  output_frame[26] = SA_MAC_Address[4];
-  output_frame[27] = SA_MAC_Address[5];
+  memcpy(&output_frame[22],SA_MAC_Address,6);
+  memcpy(&output_frame[28],SA_IP_Address,4);
+  memset(&output_frame[32],0x0,0x6);
+  memcpy(&output_frame[38],DA_IP_Address,4);
 
-  output_frame[28] = SA_IP_Address[0];
-  output_frame[29] = SA_IP_Address[1];
-  output_frame[30] = SA_IP_Address[2];
-  output_frame[31] = SA_IP_Address[3];
-
-
-
-  output_frame[32] = 0x0;
-  output_frame[33] = 0x0;
-  output_frame[34] = 0x0;
-  output_frame[35] = 0x0;
-  output_frame[36] = 0x0;
-  output_frame[37] = 0x0;
-
-  output_frame[38] = DA_IP_Address[0];
-  output_frame[39] = DA_IP_Address[1];
-  output_frame[40] = DA_IP_Address[2];
-  output_frame[41] = DA_IP_Address[3];
-
-
-
-  set_clk();
-		set_timer();
-  set_port();
-//  set_ethernet();
-//	NVIC_EnableIRQ(ETHERNET_IRQn);	
-//	Ethernet_Init();
-	
-	
-
-
-  NVIC_EnableIRQ(TIMER2_IRQn );
-
-	  TIMER_ClearITPendingBit(MDR_TIMER2, TIMER_STATUS_CNT_ARR);
-		  TIMER_SetCounter(MDR_TIMER2,0x0);
-  TIMER_Cmd(MDR_TIMER2, ENABLE);
-
-//			ethernet_WriteRAM(output_frame,42);
-//			ETH_SendFrame(MDR_ETHERNET1, output_frame,42);
-//PORT_WriteBit(MDR_PORTA, PORT_Pin_9,true);
-	uint8_t val = 0;
-  while(1)
-    {
-		
-			   if(timer_flag)
-        {
-				
-//					= PORT_ReadInputDataBit(MDR_PORTA,PORT_Pin_9);
-					val = ~val;
-		
-					PORT_WriteBit(MDR_PORTA, PORT_Pin_9,val);
-          timer_flag = false;
-//          ETH_SendFrame(  MDR_ETHERNET1,output_frame,bufflen);
-//					ethernet_WriteRAM(output_frame,42);
-					TIMER_Cmd(MDR_TIMER2, ENABLE);
-
-        }
-			
-			
-			
-   
-
-    }
-
+  ethernet_WriteRAM(output_frame,42);
 
 
 }
@@ -515,84 +535,114 @@ void TIMER2_IRQHandler(void)
     }
 }
 
-void ETHERNET_Handler(void)
-{		
-	// ????? ??????????
-	unsigned int intr = MDR_ETHERNET1->ETH_IFR;		
-	MDR_ETHERNET1->ETH_IFR = intr;
+
+void ETHERNET_IRQHandler(void)
+{
+  PORT_SetBits(MDR_PORTC,PORT_Pin_9);
+  uint16_t Status;
+  ETH_StatusPacketReceptionTypeDef packet;
+
+  // Flash LED1
+//	PORT_SetBits (MDR_PORTE, MDB_ETH_LED1);
+
+  // Get packet status and clear IT-flag
+  Status = ETH_GetMACITStatusRegister(MDR_ETHERNET1);
+
+  // Proccess valid ETH-packet
+  if( (MDR_ETHERNET1->ETH_R_Head != MDR_ETHERNET1->ETH_R_Tail) && (Status & ETH_MAC_IT_RF_OK) )
+    {
+      ETH_ReceivedFrame(MDR_ETHERNET1,input_frame);
+      // Copy packet data into buffer
+//		packet.Status = ETH_ReceivedFrame(MDR_ETHERNET1, InputFrame);
+
+      // Unicast packet
+//		if( packet.Fields.UCA )
+//			 ProcessEthIAFrame(InputFrame, packet.Fields.Length);
+      // Broadcast packet
+//		else if( packet.Fields.BCA )
+//			 ProcessEthBroadcastFrame(InputFrame, packet.Fields.Length);
+    }
+  NVIC_ClearPendingIRQ(ETHERNET_IRQn);
 }
 
 
 
-
 unsigned int ethernet_WriteRAM(void* buf, unsigned int size)
-{	
-	unsigned int head, tail;	// ????? ??????, ??????? ?????? ? ?????? ?????? ???????, ? ???
-	unsigned short tmp[2];
-	unsigned int tmp32;
-	unsigned int* src; 
-	unsigned int* dst;
-	unsigned short i;	
-	
-	head = 	MDR_ETHERNET1->ETH_X_Head;	// 
-	tail = MDR_ETHERNET1->ETH_X_Tail;	//	
+{
+  unsigned int head, tail;	// ????? ??????, ??????? ?????? ? ?????? ?????? ???????, ? ???
+  unsigned short tmp[2];
+  unsigned int tmp32;
+  unsigned int* src;
+  unsigned int* dst;
+  unsigned short i;
 
-	// ?????????? ????????? ???? ? ?????? ???????????
-	if(head > tail){			
-		tmp[0] = head - tail;
-		tmp[1] = 0;	
-	}
-	else{		
-		tmp[0] = ETH_RAM_FULL_SIZE - tail;
-		tmp[1] = head - ETH_RAM_SIZE_X;
-	}					
+  head = 	MDR_ETHERNET1->ETH_X_Head;	//
+  tail = MDR_ETHERNET1->ETH_X_Tail;	//
 
-	// ???? ????? ? ?????? ??????, ??? ?? ????? ????????(? ?????? 2-? ??????? ???? ??????????)
-	if(size > (tmp[0] + tmp[1] - 2 * sizeof(unsigned int))){				
-		return 0;			
-	}
+  // ?????????? ????????? ???? ? ?????? ???????????
+  if(head > tail)
+    {
+      tmp[0] = head - tail;
+      tmp[1] = 0;
+    }
+  else
+    {
+      tmp[0] = ETH_RAM_FULL_SIZE - tail;
+      tmp[1] = head - ETH_RAM_SIZE_X;
+    }
 
-	tmp32 = size;
+  // ???? ????? ? ?????? ??????, ??? ?? ????? ????????(? ?????? 2-? ??????? ???? ??????????)
+  if(size > (tmp[0] + tmp[1] - 2 * sizeof(unsigned int)))
+    {
+      return 0;
+    }
 
-	src = buf;
-	dst = (unsigned int*)(ETH_RAM_BASE_ADDR + tail); //??? ???????????		
+  tmp32 = size;
 
-	*dst++ = tmp32;
-	tmp[0] -= sizeof(unsigned int);
+  src = buf;
+  dst = (unsigned int*)(ETH_RAM_BASE_ADDR + tail); //??? ???????????
 
-	if(dst >= (unsigned int*)(ETH_RAM_BASE_ADDR + ETH_RAM_FULL_SIZE))
-		dst = (unsigned int*)ETH_RAM_BASE_X;
-	
+  *dst++ = tmp32;
+  tmp[0] -= sizeof(unsigned int);
 
-	tmp32 = (size + sizeof(unsigned int) - 1)/sizeof(unsigned int);	
+  if(dst >= (unsigned int*)(ETH_RAM_BASE_ADDR + ETH_RAM_FULL_SIZE))
+    dst = (unsigned int*)ETH_RAM_BASE_X;
 
-	if(size <= tmp[0]){		
-		for(i = 0; i < tmp32; i++){
-			*dst++ = *src++;			
-		}						
-	}	
-	else{				
-		tmp32 -= tmp[0]/sizeof(unsigned int);
-			
-		for(i = 0; i < tmp[0]/sizeof(unsigned int); i++)
-			*dst++ = *src++;
-		dst = (unsigned int*)ETH_RAM_BASE_X;
-		for(i = 0; i < tmp32; i++)
-			*dst++ = *src++;		
-	}	
-	
-	if(dst >= (unsigned int*)(ETH_RAM_BASE_ADDR + ETH_RAM_FULL_SIZE)){		
-		dst = (unsigned int*)ETH_RAM_BASE_X;
-	}
 
-	tmp32 = 0;	
-	*dst++ = tmp32;	
+  tmp32 = (size + sizeof(unsigned int) - 1)/sizeof(unsigned int);
 
-	if(dst >= (unsigned int*)(ETH_RAM_BASE_ADDR + ETH_RAM_FULL_SIZE)){	
-		dst = (unsigned int*)ETH_RAM_BASE_X;
-	}
-		
-	MDR_ETHERNET1->ETH_X_Tail = (unsigned int)dst;								
-	MDR_PORTA->RXTX ^= (1 << 13);
-	return size;
+  if(size <= tmp[0])
+    {
+      for(i = 0; i < tmp32; i++)
+        {
+          *dst++ = *src++;
+        }
+    }
+  else
+    {
+      tmp32 -= tmp[0]/sizeof(unsigned int);
+
+      for(i = 0; i < tmp[0]/sizeof(unsigned int); i++)
+        *dst++ = *src++;
+      dst = (unsigned int*)ETH_RAM_BASE_X;
+      for(i = 0; i < tmp32; i++)
+        *dst++ = *src++;
+    }
+
+  if(dst >= (unsigned int*)(ETH_RAM_BASE_ADDR + ETH_RAM_FULL_SIZE))
+    {
+      dst = (unsigned int*)ETH_RAM_BASE_X;
+    }
+
+  tmp32 = 0;
+  *dst++ = tmp32;
+
+  if(dst >= (unsigned int*)(ETH_RAM_BASE_ADDR + ETH_RAM_FULL_SIZE))
+    {
+      dst = (unsigned int*)ETH_RAM_BASE_X;
+    }
+
+  MDR_ETHERNET1->ETH_X_Tail = (unsigned int)dst;
+  MDR_PORTA->RXTX ^= (1 << 13);
+  return size;
 }
