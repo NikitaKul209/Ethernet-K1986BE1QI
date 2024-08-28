@@ -4,6 +4,7 @@
 ".\objects\clk.o"
 ".\objects\ethernet.o"
 ".\objects\tmr.o"
+".\objects\adc.o"
 ".\objects\startup_mdr1986ve1t.o"
 ".\objects\system_mdr1986ve1t.o"
 ".\objects\mdr32f9qx_adc.o"
