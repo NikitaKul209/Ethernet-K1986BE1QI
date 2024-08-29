@@ -19,13 +19,17 @@ void set_port(void)
   PortInit.PORT_Pin = PORT_Pin_9;
   PORT_Init(MDR_PORTC, &PortInit);
 
-//	PortInit.PORT_Pin = PORT_Pin_13;
-//	PORT_Init(MDR_PORTA, &PortInit);
+	PortInit.PORT_Pin = PORT_Pin_9;
+	PORT_Init(MDR_PORTA, &PortInit);
 
   PortInit.PORT_Pin = PORT_Pin_12;
   PORT_Init(MDR_PORTD, &PortInit);
 
-
+	PortInit.PORT_MODE = PORT_MODE_ANALOG;
+  PortInit.PORT_FUNC = PORT_FUNC_PORT;
+  PortInit.PORT_OE = PORT_OE_IN;
+  PortInit.PORT_Pin = PORT_Pin_9;
+  PORT_Init(MDR_PORTD, &PortInit);
 
 
 }

@@ -13,10 +13,12 @@
 #include "MDR32F9Qx_uart.h"
 #include "MDR32F9Qx_ssp.h"
 #include "MDR32F9Qx_eth.h"
+#include "MDR32F9Qx_adc.h"
 #include "port.h"
 #include "clk.h"
 #include "ethernet.h"
 #include "tmr.h"
+#include "adc.h"
 
 
 

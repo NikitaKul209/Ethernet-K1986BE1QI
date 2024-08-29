@@ -1,6 +1,6 @@
 
 #include "main.h"
-#include "ethernet.h"
+
 
 
 
@@ -408,9 +408,10 @@ int main(void)
   set_clk();
   set_timer();
   set_port();
+  set_adc();
 //  set_ethernet();
-  NVIC_EnableIRQ(ETHERNET_IRQn);
-  Ethernet_Init();
+//  NVIC_EnableIRQ(ETHERNET_IRQn);
+//  Ethernet_Init();
 
 
 
@@ -420,8 +421,10 @@ int main(void)
   TIMER_ClearITPendingBit(MDR_TIMER2, TIMER_STATUS_CNT_ARR);
   TIMER_SetCounter(MDR_TIMER2,0x0);
   TIMER_Cmd(MDR_TIMER2, ENABLE);
+    ADC1_Start();
+//	RST_CLK_GetClocksFreq(ADC_CLK_Frequency);
 
-//PORT_WriteBit(MDR_PORTA, PORT_Pin_9,true);
+PORT_WriteBit(MDR_PORTA, PORT_Pin_9,true);
   uint8_t val = 0;
   while(1)
     {
@@ -433,9 +436,10 @@ int main(void)
           PORT_ResetBits(MDR_PORTC,PORT_Pin_9);
           PORT_WriteBit(MDR_PORTA, PORT_Pin_9,val);
           timer_flag = false;
-          ARP_REQUEST();
+//          ARP_REQUEST();
           TIMER_Cmd(MDR_TIMER2, ENABLE);
 
+			
         }
 
 
@@ -450,7 +454,7 @@ int main(void)
 
 
 
-PING_ECHO()
+void PING_ECHO(void)
 {
 
 
@@ -529,12 +533,23 @@ void TIMER2_IRQHandler(void)
   if (TIMER_GetITStatus(MDR_TIMER2, TIMER_STATUS_CNT_ARR))
     {
       TIMER_ClearITPendingBit(MDR_TIMER2, TIMER_STATUS_CNT_ARR);
-      TIMER_Cmd(MDR_TIMER2, DISABLE);
+RST_CLK_ADCclkSelection(RST_CLK_ADCclkCPU_C1);     
+			TIMER_Cmd(MDR_TIMER2, DISABLE);
       TIMER_SetCounter(MDR_TIMER2,0x0);
       timer_flag = true;
     }
 }
+void ADC_IRQHandler (void)
+{
+  if (ADC1_GetITStatus(ADC1_IT_END_OF_CONVERSION))
+	
+    {
+      uint16_t adc_val = ADC1_GetResult();
+      ADC1_Start();
 
+    }
+
+}
 
 void ETHERNET_IRQHandler(void)
 {
