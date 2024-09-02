@@ -43,9 +43,9 @@ void set_clk(void)
 
   TIMER_BRGInit(MDR_TIMER1, TIMER_HCLKdiv128);
   TIMER_BRGInit(MDR_TIMER2, TIMER_HCLKdiv128);
+		
 	RST_CLK_ADCclkSelection(RST_CLK_ADCclkCPU_C1);
 	RST_CLK_ADCclkPrescaler(RST_CLK_ADCclkDIV2);
-	
 	RST_CLK_ADCclkEnable(ENABLE);
 	RST_CLK_PCLKcmd(RST_CLK_PCLK_ADC,ENABLE);
   /* Enables the RST_CLK_PCLK_EEPROM */

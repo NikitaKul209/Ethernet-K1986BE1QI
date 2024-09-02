@@ -393,41 +393,112 @@ uint8_t output_frame [1500] ;
 uint32_t input_frame [1500] ;
 uint8_t bufflen = 42;
 unsigned int ethernet_WriteRAM(void* buf, unsigned int size);
-
+void arp(uint8_t* packet,uint16_t length);
 void ARP_REQUEST(void);
-//  uint32_t input_frame [1500];
+
 bool  timer_flag = false;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#define ETH_TYPE_ARP     (0x0806)   /**< ???????? ???? mac_addrs::type - arp-???????? */
+#define ETH_TYPE_IPV4     (0x0800)   /**< ???????? ???? mac_addrs::type - ipv4-???????? */
+#define ARP_ASQ          (  0x01)   /**< ???????? ???? arp_frame::opcode - ?????? */
+#define ARP_REP         (  0x02)   /**< ???????? ???? arp_frame::opcode - ????? */
+
+
+
+
+
+typedef struct{
+
+uint8_t dest_mac [6];
+uint8_t source_mac [6];
+uint16_t 	ethernet_type; 
+}ethernet_header_s; 
+
+typedef struct {
+
+
+uint16_t hw_type;
+uint16_t pr_type;
+uint8_t hw_length;
+uint8_t pr_length;
+uint16_t operation;
+uint8_t	sender_mac[6];
+uint8_t sender_ip[4];
+uint8_t target_mac[6];
+uint8_t target_ip[4];	
+
+}arp_packet_s;
+
+
+enum{
+
+ARP,
+ICMP,
+UDP,
+LISTENING	
+
+}ethernet_states;
+
+
+
+
+
+
 int main(void)
 {
-
-
-
-
-
-
   set_clk();
   set_timer();
   set_port();
   set_adc();
 //  set_ethernet();
-//  NVIC_EnableIRQ(ETHERNET_IRQn);
-//  Ethernet_Init();
+  NVIC_EnableIRQ(ETHERNET_IRQn);
+  Ethernet_Init();
 
 
 
 
-  NVIC_EnableIRQ(TIMER2_IRQn );
 
-  TIMER_ClearITPendingBit(MDR_TIMER2, TIMER_STATUS_CNT_ARR);
-  TIMER_SetCounter(MDR_TIMER2,0x0);
-  TIMER_Cmd(MDR_TIMER2, ENABLE);
-    ADC1_Start();
-//	RST_CLK_GetClocksFreq(ADC_CLK_Frequency);
+
+
+//  TIMER_Cmd(MDR_TIMER2, ENABLE);
+//    ADC1_Start();
+
 
 PORT_WriteBit(MDR_PORTA, PORT_Pin_9,true);
   uint8_t val = 0;
   while(1)
-    {
+    {	
+			
+			
+			
+			
+			switch(ethernet_states){
+			
+			
+				case ARP:
+					break;
+				case ICMP:
+					break;
+				case UDP:
+					break;
+				case LISTENING:
+					break;
+			
+			}
+
 
       if(timer_flag)
         {
@@ -436,6 +507,7 @@ PORT_WriteBit(MDR_PORTA, PORT_Pin_9,true);
           PORT_ResetBits(MDR_PORTC,PORT_Pin_9);
           PORT_WriteBit(MDR_PORTA, PORT_Pin_9,val);
           timer_flag = false;
+
 //          ARP_REQUEST();
           TIMER_Cmd(MDR_TIMER2, ENABLE);
 
@@ -452,7 +524,20 @@ PORT_WriteBit(MDR_PORTA, PORT_Pin_9,true);
 
 }
 
-
+void arp(uint8_t* packet,uint16_t length){
+	
+	arp_packet_s* arp_packet =(arp_packet_s*) (packet+14);
+	arp_packet->operation = ARP_REP;
+	memcpy(arp_packet->target_ip,arp_packet->sender_ip,6);
+	memcpy(arp_packet->target_mac, arp_packet->sender_mac,6);
+	memcpy(arp_packet->sender_ip,SA_IP_Address,6);
+	memcpy(arp_packet->sender_mac,SA_MAC_Address,6);
+	memcpy(packet,arp_packet->target_mac,6);
+	memcpy(packet+6,arp_packet->sender_mac,6);
+	ethernet_WriteRAM(packet,42);
+	ethernet_states = LISTENING;
+	
+}
 
 void PING_ECHO(void)
 {
@@ -495,6 +580,10 @@ void PING_ECHO(void)
   output_frame[38] = 0xfe;
   output_frame[39] = 0x7d;
 }
+
+
+
+
 
 void ARP_REQUEST(void)
 {
@@ -541,10 +630,12 @@ RST_CLK_ADCclkSelection(RST_CLK_ADCclkCPU_C1);
 }
 void ADC_IRQHandler (void)
 {
-  if (ADC1_GetITStatus(ADC1_IT_END_OF_CONVERSION))
+  if (ADC1_GetITStatus(ADC1_IT_END_OF_CONVERSION)==SET)
 	
     {
       uint16_t adc_val = ADC1_GetResult();
+			float voltage = adc_val;
+			voltage = voltage /4096*3.3;
       ADC1_Start();
 
     }
@@ -567,6 +658,12 @@ void ETHERNET_IRQHandler(void)
   if( (MDR_ETHERNET1->ETH_R_Head != MDR_ETHERNET1->ETH_R_Tail) && (Status & ETH_MAC_IT_RF_OK) )
     {
       ETH_ReceivedFrame(MDR_ETHERNET1,input_frame);
+			ethernet_header_s* ethernet_header = (ethernet_header_s*)(input_frame);
+			if ( (memcmp(ethernet_header->dest_mac,SA_MAC_Address,6)) && ethernet_header->ethernet_type == ETH_TYPE_ARP ){
+			ethernet_states = ARP;}
+			
+			
+			
       // Copy packet data into buffer
 //		packet.Status = ETH_ReceivedFrame(MDR_ETHERNET1, InputFrame);
 

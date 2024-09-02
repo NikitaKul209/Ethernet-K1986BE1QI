@@ -16,7 +16,7 @@ ADC_InitTypeDef sADCInit;
   ADCInit.ADC_LevelControl = ADC_LEVEL_CONTROL_Disable ;
   ADCInit.ADC_HighLevel = 0;
   ADCInit.ADC_LowLevel = 0;
-   ADCInit.ADC_IntVRefSource = ADC_INT_VREF_SOURCE_INEXACT;
+  ADCInit.ADC_IntVRefSource = ADC_INT_VREF_SOURCE_INEXACT;
 
   ADCInit.ADC_Prescaler = 0;
   ADCInit.ADC_SamplingMode = ADC_SAMPLING_MODE_SINGLE_CONV;
