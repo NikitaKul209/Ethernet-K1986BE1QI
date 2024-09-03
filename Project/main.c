@@ -393,7 +393,7 @@ uint8_t output_frame [1500] ;
 uint32_t input_frame [1500] ;
 uint8_t bufflen = 42;
 unsigned int ethernet_WriteRAM(void* buf, unsigned int size);
-void arp(uint8_t* packet,uint16_t length);
+void arp(uint32_t* packet);
 void ARP_REQUEST(void);
 
 bool  timer_flag = false;
@@ -411,46 +411,54 @@ bool  timer_flag = false;
 
 
 
-#define ETH_TYPE_ARP     (0x0806)   /**< ???????? ???? mac_addrs::type - arp-???????? */
-#define ETH_TYPE_IPV4     (0x0800)   /**< ???????? ???? mac_addrs::type - ipv4-???????? */
-#define ARP_ASQ          (  0x01)   /**< ???????? ???? arp_frame::opcode - ?????? */
-#define ARP_REP         (  0x02)   /**< ???????? ???? arp_frame::opcode - ????? */
+#define ETH_TYPE_ARP     0x0806
+#define ETH_TYPE_IPV4     0x0800
+
+#define ARP_REQ           0x01
+#define ARP_REP           0x02
+#define ARP_HTYPE_ETH 0x0001
+#define ARP_PTYPE 0x0800
+#define ARP_HLEN 0x06
+#define ARP_PLEN 0x4
+
+#define IP_ADDR_SIZE 4
+#define MAC_ADDR_SIZE 6
 
 
+typedef struct
+{
+
+  uint8_t dest_mac [6];
+  uint8_t source_mac [6];
+  uint16_t 	ethernet_type;
+} ethernet_header_s;
+
+typedef struct
+{
 
 
+  uint16_t hw_type;
+  uint16_t pr_type;
+  uint8_t hw_length;
+  uint8_t pr_length;
+  uint16_t operation;
+  uint8_t	sender_mac[6];
+  uint8_t sender_ip[4];
+  uint8_t target_mac[6];
+  uint8_t target_ip[4];
 
-typedef struct{
-
-uint8_t dest_mac [6];
-uint8_t source_mac [6];
-uint16_t 	ethernet_type; 
-}ethernet_header_s; 
-
-typedef struct {
-
-
-uint16_t hw_type;
-uint16_t pr_type;
-uint8_t hw_length;
-uint8_t pr_length;
-uint16_t operation;
-uint8_t	sender_mac[6];
-uint8_t sender_ip[4];
-uint8_t target_mac[6];
-uint8_t target_ip[4];	
-
-}arp_packet_s;
+} arp_packet_s;
 
 
-enum{
+enum
+{
 
-ARP,
-ICMP,
-UDP,
-LISTENING	
+  ARP,
+  ICMP,
+  UDP,
+  LISTENING
 
-}ethernet_states;
+} ethernet_states;
 
 
 
@@ -477,27 +485,29 @@ int main(void)
 //    ADC1_Start();
 
 
-PORT_WriteBit(MDR_PORTA, PORT_Pin_9,true);
+  PORT_WriteBit(MDR_PORTA, PORT_Pin_9,true);
   uint8_t val = 0;
   while(1)
-    {	
-			
-			
-			
-			
-			switch(ethernet_states){
-			
-			
-				case ARP:
-					break;
-				case ICMP:
-					break;
-				case UDP:
-					break;
-				case LISTENING:
-					break;
-			
-			}
+    {
+
+
+
+
+      switch(ethernet_states)
+        {
+
+
+        case ARP:
+					arp(input_frame);
+          break;
+        case ICMP:
+          break;
+        case UDP:
+          break;
+        case LISTENING:
+          break;
+
+        }
 
 
       if(timer_flag)
@@ -511,7 +521,7 @@ PORT_WriteBit(MDR_PORTA, PORT_Pin_9,true);
 //          ARP_REQUEST();
           TIMER_Cmd(MDR_TIMER2, ENABLE);
 
-			
+
         }
 
 
@@ -524,19 +534,42 @@ PORT_WriteBit(MDR_PORTA, PORT_Pin_9,true);
 
 }
 
-void arp(uint8_t* packet,uint16_t length){
-	
-	arp_packet_s* arp_packet =(arp_packet_s*) (packet+14);
-	arp_packet->operation = ARP_REP;
-	memcpy(arp_packet->target_ip,arp_packet->sender_ip,6);
-	memcpy(arp_packet->target_mac, arp_packet->sender_mac,6);
-	memcpy(arp_packet->sender_ip,SA_IP_Address,6);
-	memcpy(arp_packet->sender_mac,SA_MAC_Address,6);
-	memcpy(packet,arp_packet->target_mac,6);
-	memcpy(packet+6,arp_packet->sender_mac,6);
-	ethernet_WriteRAM(packet,42);
-	ethernet_states = LISTENING;
-	
+void arp(uint32_t* packet)
+{
+
+  ethernet_header_s* rec_ethernet_header = (ethernet_header_s*)packet;
+  arp_packet_s* rec_arp_packet = (arp_packet_s*)(packet + sizeof(ethernet_header_s));
+
+
+  if (memcmp(rec_arp_packet->target_ip, SA_IP_Address, IP_ADDR_SIZE) != 0)
+    {
+      ethernet_states = LISTENING;
+      return;
+    }
+  if ((rec_arp_packet->operation) == ARP_REQ)
+    {
+
+
+      ethernet_header_s* tx_ethernet_header =(ethernet_header_s*) output_frame;
+      arp_packet_s* tx_arp_packet =(arp_packet_s*) (packet+14);
+
+      tx_arp_packet->hw_type = ARP_HTYPE_ETH;
+      tx_arp_packet->pr_type = ARP_PTYPE;
+      tx_arp_packet->hw_length =ARP_HLEN;
+      tx_arp_packet->pr_length =ARP_PLEN;
+      tx_arp_packet->operation = ARP_REP;
+      memcpy(tx_arp_packet->sender_mac, SA_MAC_Address,6);
+      memcpy(tx_arp_packet->sender_ip,SA_IP_Address,6);
+      memcpy(tx_arp_packet->target_mac,rec_arp_packet->sender_mac,6);
+      memcpy(tx_arp_packet->target_ip,rec_arp_packet->sender_ip,6);
+
+      ethernet_WriteRAM(output_frame,42);
+      ethernet_states = LISTENING;
+
+    }
+
+
+
 }
 
 void PING_ECHO(void)
@@ -622,8 +655,8 @@ void TIMER2_IRQHandler(void)
   if (TIMER_GetITStatus(MDR_TIMER2, TIMER_STATUS_CNT_ARR))
     {
       TIMER_ClearITPendingBit(MDR_TIMER2, TIMER_STATUS_CNT_ARR);
-RST_CLK_ADCclkSelection(RST_CLK_ADCclkCPU_C1);     
-			TIMER_Cmd(MDR_TIMER2, DISABLE);
+      RST_CLK_ADCclkSelection(RST_CLK_ADCclkCPU_C1);
+      TIMER_Cmd(MDR_TIMER2, DISABLE);
       TIMER_SetCounter(MDR_TIMER2,0x0);
       timer_flag = true;
     }
@@ -631,11 +664,11 @@ RST_CLK_ADCclkSelection(RST_CLK_ADCclkCPU_C1);
 void ADC_IRQHandler (void)
 {
   if (ADC1_GetITStatus(ADC1_IT_END_OF_CONVERSION)==SET)
-	
+
     {
       uint16_t adc_val = ADC1_GetResult();
-			float voltage = adc_val;
-			voltage = voltage /4096*3.3;
+      float voltage = adc_val;
+      voltage = voltage /4096*3.3;
       ADC1_Start();
 
     }
@@ -658,22 +691,24 @@ void ETHERNET_IRQHandler(void)
   if( (MDR_ETHERNET1->ETH_R_Head != MDR_ETHERNET1->ETH_R_Tail) && (Status & ETH_MAC_IT_RF_OK) )
     {
       ETH_ReceivedFrame(MDR_ETHERNET1,input_frame);
-			ethernet_header_s* ethernet_header = (ethernet_header_s*)(input_frame);
-			if ( (memcmp(ethernet_header->dest_mac,SA_MAC_Address,6)) && ethernet_header->ethernet_type == ETH_TYPE_ARP ){
-			ethernet_states = ARP;}
-			
-			
-			
-      // Copy packet data into buffer
+      ethernet_header_s* ethernet_header = (ethernet_header_s*)(input_frame);
+      if (  ethernet_header->ethernet_type == ETH_TYPE_ARP )
+        {
+          ethernet_states = ARP;
+        }
+    }
+
+
+  // Copy packet data into buffer
 //		packet.Status = ETH_ReceivedFrame(MDR_ETHERNET1, InputFrame);
 
-      // Unicast packet
+  // Unicast packet
 //		if( packet.Fields.UCA )
 //			 ProcessEthIAFrame(InputFrame, packet.Fields.Length);
-      // Broadcast packet
+  // Broadcast packet
 //		else if( packet.Fields.BCA )
 //			 ProcessEthBroadcastFrame(InputFrame, packet.Fields.Length);
-    }
+
   NVIC_ClearPendingIRQ(ETHERNET_IRQn);
 }
 
