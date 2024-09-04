@@ -30,8 +30,8 @@
 
 extern uint8_t DA_MAC_Address[6] ;
 extern uint8_t SA_MAC_Address[6] ;
-extern uint8_t DA_IP_Address[6];
-extern uint8_t SA_IP_Address[6];
+extern uint8_t DA_IP_Address[4];
+extern uint8_t SA_IP_Address[4];
 void set_ethernet(void);
 void Ethernet_Init (void);
 

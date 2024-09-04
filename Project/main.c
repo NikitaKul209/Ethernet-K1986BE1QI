@@ -387,15 +387,15 @@ unsigned short CalcHeaderCS(void* buf, unsigned int size);
 
 extern uint8_t DA_MAC_Address[6];
 extern uint8_t SA_MAC_Address[6];
-extern uint8_t SA_IP_Address[6];
-extern uint8_t DA_IP_Address[6];
-uint8_t output_frame [1500] ;
-uint32_t input_frame [1500] ;
-uint8_t bufflen = 42;
+extern uint8_t SA_IP_Address[4];
+extern uint8_t DA_IP_Address[4];
+uint8_t output_frame [150] ;
+uint32_t input_frame [150] ;
+
 unsigned int ethernet_WriteRAM(void* buf, unsigned int size);
 void arp(uint32_t* packet);
 void ARP_REQUEST(void);
-
+uint16_t switch_byte(uint16_t val);
 bool  timer_flag = false;
 
 
@@ -411,13 +411,13 @@ bool  timer_flag = false;
 
 
 
-#define ETH_TYPE_ARP     0x0806
-#define ETH_TYPE_IPV4     0x0800
+#define ETH_TYPE_ARP     switch_byte(0x0806)
+#define ETH_TYPE_IPV4     switch_byte(0x0800)
 
-#define ARP_REQ           0x01
-#define ARP_REP           0x02
-#define ARP_HTYPE_ETH 0x0001
-#define ARP_PTYPE 0x0800
+#define ARP_REQ           switch_byte(0x0001)
+#define ARP_REP           switch_byte(0x0002)
+#define ARP_HTYPE_ETH  switch_byte(0x0001)
+#define ARP_PTYPE switch_byte(0x0800)
 #define ARP_HLEN 0x06
 #define ARP_PLEN 0x4
 
@@ -449,6 +449,11 @@ typedef struct
 
 } arp_packet_s;
 
+typedef struct{
+
+
+
+}ip_header_s;
 
 enum
 {
@@ -474,6 +479,7 @@ int main(void)
 //  set_ethernet();
   NVIC_EnableIRQ(ETHERNET_IRQn);
   Ethernet_Init();
+	ethernet_states = LISTENING; 
 
 
 
@@ -510,19 +516,19 @@ int main(void)
         }
 
 
-      if(timer_flag)
-        {
+//      if(timer_flag)
+//        {
 
-          val = ~val;
-          PORT_ResetBits(MDR_PORTC,PORT_Pin_9);
-          PORT_WriteBit(MDR_PORTA, PORT_Pin_9,val);
-          timer_flag = false;
+//          val = ~val;
+//          PORT_ResetBits(MDR_PORTC,PORT_Pin_9);
+//          PORT_WriteBit(MDR_PORTA, PORT_Pin_9,val);
+//          timer_flag = false;
 
-//          ARP_REQUEST();
-          TIMER_Cmd(MDR_TIMER2, ENABLE);
+////          ARP_REQUEST();
+//          TIMER_Cmd(MDR_TIMER2, ENABLE);
 
 
-        }
+//        }
 
 
 
@@ -536,9 +542,9 @@ int main(void)
 
 void arp(uint32_t* packet)
 {
-
-  ethernet_header_s* rec_ethernet_header = (ethernet_header_s*)packet;
-  arp_packet_s* rec_arp_packet = (arp_packet_s*)(packet + sizeof(ethernet_header_s));
+	uint8_t* byte_buffer = (uint8_t*)packet;
+  ethernet_header_s* rec_ethernet_header = (ethernet_header_s*)byte_buffer;
+  arp_packet_s* rec_arp_packet = (arp_packet_s*)(byte_buffer + 14);
 
 
   if (memcmp(rec_arp_packet->target_ip, SA_IP_Address, IP_ADDR_SIZE) != 0)
@@ -546,13 +552,21 @@ void arp(uint32_t* packet)
       ethernet_states = LISTENING;
       return;
     }
-  if ((rec_arp_packet->operation) == ARP_REQ)
+  if (((rec_arp_packet->operation)) == ARP_REQ)
     {
 
-
+			
+//			uint8_t* tx_byte_buffer = (uint8_t*)output_frame;
       ethernet_header_s* tx_ethernet_header =(ethernet_header_s*) output_frame;
-      arp_packet_s* tx_arp_packet =(arp_packet_s*) (packet+14);
+      arp_packet_s* tx_arp_packet =(arp_packet_s*) (output_frame+14);
+			
+		
 
+			
+			memcpy(tx_ethernet_header->dest_mac, DA_MAC_Address,6);
+      memcpy(tx_ethernet_header->source_mac,SA_MAC_Address,6);
+			tx_ethernet_header->ethernet_type = ETH_TYPE_ARP;
+			
       tx_arp_packet->hw_type = ARP_HTYPE_ETH;
       tx_arp_packet->pr_type = ARP_PTYPE;
       tx_arp_packet->hw_length =ARP_HLEN;
@@ -562,7 +576,11 @@ void arp(uint32_t* packet)
       memcpy(tx_arp_packet->sender_ip,SA_IP_Address,6);
       memcpy(tx_arp_packet->target_mac,rec_arp_packet->sender_mac,6);
       memcpy(tx_arp_packet->target_ip,rec_arp_packet->sender_ip,6);
-
+////			
+//			uint32_t* ptr_buf = (uint32_t*) output_frame;
+//			uint32_t len = 42;
+//			ETH_SendFrame(MDR_ETHERNET1,	output_frame,42);
+//			
       ethernet_WriteRAM(output_frame,42);
       ethernet_states = LISTENING;
 
@@ -614,7 +632,12 @@ void PING_ECHO(void)
   output_frame[39] = 0x7d;
 }
 
+uint16_t switch_byte(uint16_t val){
+	
+return ((val>>8)|(val<<8));	
 
+
+}
 
 
 
@@ -692,7 +715,7 @@ void ETHERNET_IRQHandler(void)
     {
       ETH_ReceivedFrame(MDR_ETHERNET1,input_frame);
       ethernet_header_s* ethernet_header = (ethernet_header_s*)(input_frame);
-      if (  ethernet_header->ethernet_type == ETH_TYPE_ARP )
+      if (  ( ethernet_header->ethernet_type) == ETH_TYPE_ARP )
         {
           ethernet_states = ARP;
         }

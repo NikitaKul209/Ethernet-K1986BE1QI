@@ -4,8 +4,8 @@
 
 uint8_t DA_MAC_Address[6] = {0x58,0xD5,0x6E,0x3E,0x11,0xC8};
 uint8_t SA_MAC_Address[6] = {0x34,0x13,0x78,0x56,0xbc,0x9a};
-uint8_t SA_IP_Address[6] = { 169,254,254,172};
-uint8_t DA_IP_Address[6] = { 169,254,254,1};
+uint8_t SA_IP_Address[4] = { 169,254,254,172};
+uint8_t DA_IP_Address[4] = { 169,254,254,1};
 
 
 void set_ethernet()
@@ -113,11 +113,14 @@ void Ethernet_Init (void)
 //	initStruct.ETH_MAC_Address[2] = (MAC_0<<8)|MAC_1;
 //	initStruct.ETH_MAC_Address[1] = (MAC_2<<8)|MAC_3;
 //	initStruct.ETH_MAC_Address[0] = (MAC_4<<8)|MAC_5;
-
+//	  initStruct.ETH_Transmitter_Bits_Order = ETH_TRANSMITTER_BITS_ORDER_MSB;    
   initStruct.ETH_MAC_Address[0] = (SA_MAC_Address[1] | SA_MAC_Address[0]<<8) ;
   initStruct.ETH_MAC_Address[1] = (SA_MAC_Address[3] | SA_MAC_Address[2]<<8);
   initStruct.ETH_MAC_Address[2] = (SA_MAC_Address[5] | SA_MAC_Address[4]<<8);
-
+  
+//initStruct.ETH_Transmitter_BE =  ETH_TRANSMITTER_BE_LITTLE_ENDIAN;            
+//initStruct.ETH_Transmitter_Bits_Order = ETH_TRANSMITTER_BITS_ORDER_LSB;  
+	
   ETH_Init(MDR_ETHERNET1, &initStruct);
   ETH_PHYCmd(MDR_ETHERNET1, ENABLE);
 
