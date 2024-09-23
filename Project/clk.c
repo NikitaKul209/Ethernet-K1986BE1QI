@@ -23,7 +23,7 @@ void set_clk(void)
     {
       while(1);
     };
-  RST_CLK_CPU_PLLconfig(RST_CLK_CPU_PLLsrcHSEdiv1, RST_CLK_CPU_PLLmul5 );
+  RST_CLK_CPU_PLLconfig(RST_CLK_CPU_PLLsrcHSEdiv1, RST_CLK_CPU_PLLmul7 );
   RST_CLK_CPU_PLLuse(ENABLE);
 
   RST_CLK_CPUclkSelection(RST_CLK_CPUclkCPU_C3);
@@ -44,10 +44,10 @@ void set_clk(void)
   TIMER_BRGInit(MDR_TIMER1, TIMER_HCLKdiv128);
   TIMER_BRGInit(MDR_TIMER2, TIMER_HCLKdiv128);
 		
-	RST_CLK_ADCclkSelection(RST_CLK_ADCclkCPU_C1);
-	RST_CLK_ADCclkPrescaler(RST_CLK_ADCclkDIV2);
-	RST_CLK_ADCclkEnable(ENABLE);
-	RST_CLK_PCLKcmd(RST_CLK_PCLK_ADC,ENABLE);
+//	RST_CLK_ADCclkSelection(RST_CLK_ADCclkCPU_C1);
+//	RST_CLK_ADCclkPrescaler(RST_CLK_ADCclkDIV2);
+//	RST_CLK_ADCclkEnable(ENABLE);
+//	RST_CLK_PCLKcmd(RST_CLK_PCLK_ADC,ENABLE);
   /* Enables the RST_CLK_PCLK_EEPROM */
 //	RST_CLK_PCLKcmd(RST_CLK_PCLK_EEPROM, ENABLE);
 

@@ -107,16 +107,23 @@ void Ethernet_Init (void)
   initStruct.ETH_Buffer_Mode              = ETH_BUFFER_MODE_LINEAR;
   initStruct.ETH_Source_Addr_HASH_Filter  = DISABLE;
   initStruct.ETH_Receive_All_Packets = DISABLE;
+	initStruct.ETH_Unicast_Frames_Reception = ENABLE;
   // ERRATA 0019
-//	initStruct.ETH_Control_Frames_Reception = ENABLE;
+	initStruct.ETH_Control_Frames_Reception = ENABLE;
   // Set the MAC address (see: tcpip.h).
-//	initStruct.ETH_MAC_Address[2] = (MAC_0<<8)|MAC_1;
-//	initStruct.ETH_MAC_Address[1] = (MAC_2<<8)|MAC_3;
-//	initStruct.ETH_MAC_Address[0] = (MAC_4<<8)|MAC_5;
+
 //	  initStruct.ETH_Transmitter_Bits_Order = ETH_TRANSMITTER_BITS_ORDER_MSB;    
   initStruct.ETH_MAC_Address[0] = (SA_MAC_Address[1] | SA_MAC_Address[0]<<8) ;
   initStruct.ETH_MAC_Address[1] = (SA_MAC_Address[3] | SA_MAC_Address[2]<<8);
   initStruct.ETH_MAC_Address[2] = (SA_MAC_Address[5] | SA_MAC_Address[4]<<8);
+	
+	
+	
+	initStruct.ETH_IPG = 0x0060;
+	initStruct.ETH_PSC = 0x50;
+	initStruct.ETH_BAG = 0x200;
+	initStruct.ETH_JitterWnd = 0x5;
+	
   
 //initStruct.ETH_Transmitter_BE =  ETH_TRANSMITTER_BE_LITTLE_ENDIAN;            
 //initStruct.ETH_Transmitter_Bits_Order = ETH_TRANSMITTER_BITS_ORDER_LSB;  
@@ -131,5 +138,5 @@ void Ethernet_Init (void)
   ETH_MACITConfig(MDR_ETHERNET1, ETH_MAC_IT_RF_OK, ENABLE);
   NVIC_ClearPendingIRQ(ETHERNET_IRQn);
 //	NVIC_EnableIRQ(ETHERNET_IRQn);
-  ETH_Start(MDR_ETHERNET1);
+ 
 }
