@@ -389,8 +389,9 @@ extern uint8_t DA_MAC_Address[6];
 extern uint8_t SA_MAC_Address[6];
 extern uint8_t SA_IP_Address[4];
 extern uint8_t DA_IP_Address[4];
-uint32_t output_frame [150] ;
-uint32_t input_frame [150] ;
+uint32_t output_frame [150]  ;
+uint32_t input_frame [150]   ;
+
 
 unsigned int ethernet_WriteRAM(void* buf, unsigned int size);
 void arp(uint32_t* packet);
@@ -480,20 +481,21 @@ typedef struct
 
 } ip_header_s;
 
-typedef struct{
+typedef struct
+{
 
 
 
-uint8_t type;
-uint8_t code;
-uint16_t crc;
-uint16_t identifier;
-uint16_t sequence;
-}icmp_header_s;
+  uint8_t type;
+  uint8_t code;
+  uint16_t crc;
+  uint16_t identifier;
+  uint16_t sequence;
+} icmp_header_s;
 
 enum
 {
-	LISTENING,
+  LISTENING,
   ARP,
   IPV4,
 
@@ -504,7 +506,7 @@ enum
 
   UDP,
   ICMP,
-	PASS,
+  PASS,
 
 } ipv4_states;
 
@@ -517,9 +519,10 @@ int main(void)
   set_timer();
   set_port();
 //  set_adc();
-//  set_ethernet();
-  NVIC_EnableIRQ(ETHERNET_IRQn);
-  Ethernet_Init();
+  set_ethernet2();
+//	delay(100000);
+
+
   ethernet_states = LISTENING;
 
 
@@ -532,13 +535,56 @@ int main(void)
 //    ADC1_Start();
 
 
-  PORT_WriteBit(MDR_PORTA, PORT_Pin_9,true);
+
   uint8_t val = 0;
-			 ETH_Start(MDR_ETHERNET1);
+  uint32_t Status;
   while(1)
 
     {
+      if(MDR_ETHERNET1->ETH_R_Head != MDR_ETHERNET1->ETH_R_Tail)   //If receiver buffer contains incoming packet.
+        {
+          Status = ETH_GetMACITStatusRegister(MDR_ETHERNET1);
+          ETH_StatusPacketReceptionTypeDef ETH_StatusPacketReceptionStruct;
 
+          // Proccess valid ETH-packet
+          if( (MDR_ETHERNET1->ETH_R_Head != MDR_ETHERNET1->ETH_R_Tail) && (Status & ETH_MAC_IT_RF_OK) )
+            {
+              ETH_StatusPacketReceptionStruct.Status =  ETH_ReceivedFrame(MDR_ETHERNET1,input_frame);
+              ethernet_header_s* ethernet_header = (ethernet_header_s*)(input_frame);
+
+              if( ETH_StatusPacketReceptionStruct.Fields.BCA)
+                {
+//              if ( ethernet_header->ethernet_type == ETH_TYPE_ARP )
+//                {
+                  ethernet_states = ARP;
+//                }
+                }
+              if ( memcmp(ethernet_header->dest_mac,SA_MAC_Address,6 )==0)
+                {
+
+                  ethernet_states = IPV4;
+                }
+//
+
+              else if( ETH_StatusPacketReceptionStruct.Fields.UCA)
+                {
+
+
+                  if ( ethernet_header->ethernet_type == ETH_TYPE_IPV4)
+                    {
+                      ethernet_states = IPV4;
+                    }
+
+
+                }
+
+//				else{
+//
+//
+//					 ethernet_states = LISTENING;
+//				}
+            }
+        }
 
 
 
@@ -551,16 +597,6 @@ int main(void)
           break;
         case IPV4:
           ipv_4(input_frame);
-          switch(ipv4_states)
-            {
-            case ICMP:
-							icmp(input_frame);
-              break;
-            case UDP:
-              break;
-						case PASS:
-              break;
-            }
           break;
         case LISTENING:
           break;
@@ -600,43 +636,41 @@ void arp(uint32_t* packet)
   arp_packet_s* rec_arp_packet = (arp_packet_s*)(byte_buffer + ETHERNET_HEADER_SIZE);
 
 
-  if (memcmp(rec_arp_packet->target_ip, SA_IP_Address, IP_ADDR_SIZE) != 0)
-    {
-      ethernet_states = LISTENING;
-      return;
-    }
-  if (((rec_arp_packet->operation)) == ARP_REQ)
+  if (memcmp(rec_arp_packet->target_ip, SA_IP_Address, IP_ADDR_SIZE) == 0)
     {
 
-			output_frame[0]= 42;
-			uint8_t* tx_byte_buffer = (uint8_t*)output_frame+4;
-      ethernet_header_s* tx_ethernet_header =(ethernet_header_s*) tx_byte_buffer;
-      arp_packet_s* tx_arp_packet =(arp_packet_s*) (tx_byte_buffer+ETHERNET_HEADER_SIZE);
+      if (((rec_arp_packet->operation)) == ARP_REQ)
+        {
 
+          output_frame[0]= 42;
+          uint8_t* tx_byte_buffer = (uint8_t*)output_frame+4;
+          ethernet_header_s* tx_ethernet_header =(ethernet_header_s*) tx_byte_buffer;
+          arp_packet_s* tx_arp_packet =(arp_packet_s*) (tx_byte_buffer+ETHERNET_HEADER_SIZE);
 
-      memcpy(tx_ethernet_header->dest_mac, DA_MAC_Address,6);
-      memcpy(tx_ethernet_header->source_mac,SA_MAC_Address,6);
-      tx_ethernet_header->ethernet_type = ETH_TYPE_ARP;
+          memcpy(tx_ethernet_header->dest_mac, DA_MAC_Address,6);
+          memcpy(tx_ethernet_header->source_mac,SA_MAC_Address,6);
+          tx_ethernet_header->ethernet_type = ETH_TYPE_ARP;
 
-      tx_arp_packet->hw_type = ARP_HTYPE_ETH;
-      tx_arp_packet->pr_type = ARP_PTYPE;
-      tx_arp_packet->hw_length =ARP_HLEN;
-      tx_arp_packet->pr_length =ARP_PLEN;
-      tx_arp_packet->operation = ARP_REP;
-      memcpy(tx_arp_packet->sender_mac, SA_MAC_Address,6);
-      memcpy(tx_arp_packet->sender_ip,SA_IP_Address,6);
-      memcpy(tx_arp_packet->target_mac,rec_arp_packet->sender_mac,6);
-      memcpy(tx_arp_packet->target_ip,rec_arp_packet->sender_ip,6);
+          tx_arp_packet->hw_type = ARP_HTYPE_ETH;
+          tx_arp_packet->pr_type = ARP_PTYPE;
+          tx_arp_packet->hw_length =ARP_HLEN;
+          tx_arp_packet->pr_length =ARP_PLEN;
+          tx_arp_packet->operation = ARP_REP;
+          memcpy(tx_arp_packet->sender_mac, SA_MAC_Address,6);
+          memcpy(tx_arp_packet->sender_ip,SA_IP_Address,6);
+          memcpy(tx_arp_packet->target_mac,rec_arp_packet->sender_mac,6);
+          memcpy(tx_arp_packet->target_ip,rec_arp_packet->sender_ip,6);
+
 ////
 //			uint32_t* ptr_buf = (uint32_t*) output_frame;
 //			uint32_t len = 42;
 //			ETH_SendFrame(MDR_ETHERNET1,	output_frame,42);
 //
-//      ethernet_WriteRAM(tx_byte_buffer,ETHERNET_HEADER_SIZE+ARP_HEADER_SIZE);
-			ETH_SendFrame(MDR_ETHERNET1,output_frame, ARP_HEADER_SIZE + ETHERNET_HEADER_SIZE);
-			
+//      ethernet_WriteRAM((uint8_t *)output_frame+4,*(uint32_t*)&output_frame[0]);
+          ETH_SendFrame(MDR_ETHERNET1,(uint32_t *)output_frame,*(uint32_t*)&output_frame[0]);
 
-    
+        }
+
 
     }
 
@@ -651,19 +685,19 @@ void ipv_4(uint32_t* packet)
   ethernet_header_s* rec_ethernet_header = (ethernet_header_s*)byte_buffer;
   ip_header_s* rec_ip_header = (ip_header_s*)(byte_buffer+ETHERNET_HEADER_SIZE);
 
-	
-	uint16_t crc_rec = (rec_ip_header->crc);
-	 rec_ip_header->crc = 0x0;
-uint16_t crc16 = calc_crc16((uint16_t*)rec_ip_header,IP_HEADER_SIZE);
+
+  uint16_t crc_rec = (rec_ip_header->crc);
+  rec_ip_header->crc = 0x0;
+  uint16_t crc16 = calc_crc16((uint16_t*)rec_ip_header,IP_HEADER_SIZE);
 
 
-  if(crc_rec== calc_crc16((uint16_t*)rec_ip_header,IP_HEADER_SIZE))
+  if(crc_rec == crc16)
     {
 
       if (memcmp(rec_ip_header->target_ip, SA_IP_Address, IP_ADDR_SIZE) != 0)
         {
           ethernet_states = LISTENING;
-						NVIC_EnableIRQ(ETHERNET_IRQn);
+
           return;
         }
 
@@ -671,10 +705,9 @@ uint16_t crc16 = calc_crc16((uint16_t*)rec_ip_header,IP_HEADER_SIZE);
       if (rec_ip_header->high_level_protocol == IP_PROTOCOL_ICMP)
         {
 
-          ipv4_states = ICMP;
-					
-						NVIC_EnableIRQ(ETHERNET_IRQn);
-					return;
+          icmp(input_frame);
+
+          return;
 
         }
       else if (rec_ip_header->high_level_protocol == IP_PROTOCOL_UDP)
@@ -682,54 +715,56 @@ uint16_t crc16 = calc_crc16((uint16_t*)rec_ip_header,IP_HEADER_SIZE);
 
           ipv4_states = UDP;
 
-					 return;
+          return;
 
         }
 
     }
-
+  ethernet_states = LISTENING;
 }
 
 
-void icmp(uint32_t* packet){
+void icmp(uint32_t* packet)
+{
 
-	uint8_t* byte_buffer = (uint8_t*)packet;
+  uint8_t* byte_buffer = (uint8_t*)packet;
   ethernet_header_s* rec_ethernet_header = (ethernet_header_s*)byte_buffer;
   ip_header_s* rec_ip_header = (ip_header_s*)(byte_buffer+ETHERNET_HEADER_SIZE);
-	icmp_header_s* rec_icmp_header = (icmp_header_s*)(byte_buffer+ETHERNET_HEADER_SIZE+IP_HEADER_SIZE);
-	
-	
-	uint8_t* tx_byte_buffer = (uint8_t*)output_frame;
-  ethernet_header_s* tx_ethernet_header =(ethernet_header_s*) tx_byte_buffer;
-	ip_header_s* tx_ip_header = (ip_header_s*)(tx_byte_buffer+ETHERNET_HEADER_SIZE);
-  icmp_header_s* tx_icmp_packet =(icmp_header_s*) (tx_byte_buffer+ETHERNET_HEADER_SIZE+IP_HEADER_SIZE);
-	
-	
-	memcpy(tx_ethernet_header->dest_mac, rec_ethernet_header->source_mac,6);
-  memcpy(tx_ethernet_header->source_mac,SA_MAC_Address,6);
-	tx_ethernet_header->ethernet_type = ETH_TYPE_IPV4;
-	
-	tx_ip_header->version_ihl = 0x45;
-	tx_ip_header->type_of_service = rec_ip_header->type_of_service;
-	tx_ip_header->total_length = IP_HEADER_SIZE+ICMP_HEADER_SIZE;
-	tx_ip_header->identification = rec_ip_header->identification;
-	tx_ip_header->flags_and_fragment_offset = rec_ip_header->flags_and_fragment_offset;
-	tx_ip_header->time_to_live = IP_TTL;
-	tx_ip_header->high_level_protocol = IP_PROTOCOL_ICMP;
-	memcpy(DA_IP_Address,	tx_ip_header->sender_ip,IP_ADDR_SIZE);
-	memcpy(rec_ip_header->sender_ip,	tx_ip_header->target_ip,IP_ADDR_SIZE);
-	tx_ip_header->crc = 0x0;
-	tx_ip_header->crc = calc_crc16((uint16_t*)tx_ip_header,IP_HEADER_SIZE);
-	
-	
-	tx_icmp_packet->code = 0x0;
-	tx_icmp_packet->type = 0x0;
-	tx_icmp_packet->identifier = rec_icmp_header->identifier;
-	tx_icmp_packet->sequence = rec_icmp_header->sequence;
-	memcpy(tx_byte_buffer+ETHERNET_HEADER_SIZE+IP_HEADER_SIZE+ICMP_HEADER_SIZE,byte_buffer+ETHERNET_HEADER_SIZE+IP_HEADER_SIZE+ICMP_HEADER_SIZE,32);
-	tx_icmp_packet->crc = 0;
-	tx_icmp_packet->crc = calc_crc16((uint16_t*)tx_icmp_packet,ICMP_HEADER_SIZE+32);
+  icmp_header_s* rec_icmp_header = (icmp_header_s*)(byte_buffer+ETHERNET_HEADER_SIZE+IP_HEADER_SIZE);
 
+
+  uint8_t* tx_byte_buffer = (uint8_t*)output_frame;
+  ethernet_header_s* tx_ethernet_header =(ethernet_header_s*) tx_byte_buffer;
+  ip_header_s* tx_ip_header = (ip_header_s*)(tx_byte_buffer+ETHERNET_HEADER_SIZE);
+  icmp_header_s* tx_icmp_packet =(icmp_header_s*) (tx_byte_buffer+ETHERNET_HEADER_SIZE+IP_HEADER_SIZE);
+
+
+  memcpy(tx_ethernet_header->dest_mac, rec_ethernet_header->source_mac,6);
+  memcpy(tx_ethernet_header->source_mac,SA_MAC_Address,6);
+  tx_ethernet_header->ethernet_type = ETH_TYPE_IPV4;
+
+  tx_ip_header->version_ihl = 0x45;
+  tx_ip_header->type_of_service = rec_ip_header->type_of_service;
+  tx_ip_header->total_length = switch_byte(IP_HEADER_SIZE+ICMP_HEADER_SIZE+32);
+  tx_ip_header->identification = rec_ip_header->identification;
+  tx_ip_header->flags_and_fragment_offset = rec_ip_header->flags_and_fragment_offset;
+  tx_ip_header->time_to_live = IP_TTL;
+  tx_ip_header->high_level_protocol = IP_PROTOCOL_ICMP;
+  memcpy(tx_ip_header->sender_ip,SA_IP_Address,	IP_ADDR_SIZE);
+  memcpy(tx_ip_header->target_ip,rec_ip_header->sender_ip,	IP_ADDR_SIZE);
+  tx_ip_header->crc = 0x0;
+  tx_ip_header->crc = calc_crc16((uint16_t*)tx_ip_header,IP_HEADER_SIZE);
+
+
+  tx_icmp_packet->code = 0x0;
+  tx_icmp_packet->type = 0x0;
+  tx_icmp_packet->identifier = rec_icmp_header->identifier;
+  tx_icmp_packet->sequence = rec_icmp_header->sequence;
+  memcpy(tx_byte_buffer+ETHERNET_HEADER_SIZE+IP_HEADER_SIZE+ICMP_HEADER_SIZE,byte_buffer+ETHERNET_HEADER_SIZE+IP_HEADER_SIZE+ICMP_HEADER_SIZE,32);
+  tx_icmp_packet->crc = 0;
+  tx_icmp_packet->crc = calc_crc16((uint16_t*)tx_icmp_packet,ICMP_HEADER_SIZE+32);
+
+//  ETH_SendFrame(MDR_ETHERNET1,&output_frame[0],ETHERNET_HEADER_SIZE+IP_HEADER_SIZE+ICMP_HEADER_SIZE+32);
   ethernet_WriteRAM(tx_byte_buffer,ETHERNET_HEADER_SIZE+IP_HEADER_SIZE+ICMP_HEADER_SIZE+32);
 }
 
@@ -741,15 +776,21 @@ uint16_t calc_crc16(uint16_t* ipv4_header,uint8_t length)
   for (int i=0; i<length/2; i++)
     {
       sum+=ipv4_header[i];
-      if(sum&0xffff0000)
-        {
-
-          sum = (sum & 0xffff)+(sum>>16);
-        }
-
     }
-  uint16_t crc =  ~sum&0xffff;
-		 return crc;
+  if (length%2!=0)
+    {
+      sum+=*((uint8_t*)ipv4_header+length-1);
+    }
+
+  while(sum>>16)
+    {
+
+      sum = (sum & 0xffff)+(sum>>16);
+    }
+
+
+
+  return ~((uint16_t)sum);
 
 }
 
@@ -762,7 +803,10 @@ uint16_t switch_byte(uint16_t val)
 
 }
 
-
+void delay(uint32_t ticks)
+{
+  while(ticks --);
+}
 void TIMER2_IRQHandler(void)
 {
   if (TIMER_GetITStatus(MDR_TIMER2, TIMER_STATUS_CNT_ARR))
@@ -790,47 +834,74 @@ void ADC_IRQHandler (void)
 
 void ETHERNET_IRQHandler(void)
 {
-  PORT_SetBits(MDR_PORTC,PORT_Pin_9);
-  uint16_t Status;
-  ETH_StatusPacketReceptionTypeDef packet;
+  if (ETH_GetMACITStatus(MDR_ETHERNET1,ETH_MAC_IT_RF_OK))
+    {
 
-  // Flash LED1
+      PORT_SetBits(MDR_PORTC,PORT_Pin_9);
+      uint16_t Status;
+
+
+//      // Flash LED1
 //	PORT_SetBits (MDR_PORTE, MDB_ETH_LED1);
 
-  // Get packet status and clear IT-flag
-  Status = ETH_GetMACITStatusRegister(MDR_ETHERNET1);
-	ETH_StatusPacketReceptionTypeDef ETH_StatusPacketReceptionStruct;
+      // Get packet status and clear IT-flag
+      Status = ETH_GetMACITStatusRegister(MDR_ETHERNET1);
+      ETH_StatusPacketReceptionTypeDef ETH_StatusPacketReceptionStruct;
 
-  // Proccess valid ETH-packet
-  if( (MDR_ETHERNET1->ETH_R_Head != MDR_ETHERNET1->ETH_R_Tail) && (Status & ETH_MAC_IT_RF_OK) )
-    {
-      ETH_ReceivedFrame(MDR_ETHERNET1,input_frame);
-      ethernet_header_s* ethernet_header = (ethernet_header_s*)(input_frame);
-      if ( ethernet_header->ethernet_type == ETH_TYPE_ARP )
+      // Proccess valid ETH-packet
+      if( (MDR_ETHERNET1->ETH_R_Head != MDR_ETHERNET1->ETH_R_Tail) && (Status & ETH_MAC_IT_RF_OK) )
         {
-          ethernet_states = ARP;
+          ETH_StatusPacketReceptionStruct.Status =  ETH_ReceivedFrame(MDR_ETHERNET1,input_frame);
+          ethernet_header_s* ethernet_header = (ethernet_header_s*)(input_frame);
+          if ( ethernet_header->ethernet_type == ETH_TYPE_ARP )
+            {
+              ethernet_states = ARP;
+            }
+
+          if( ETH_StatusPacketReceptionStruct.Fields.BCA)
+            {
+//              if ( ethernet_header->ethernet_type == ETH_TYPE_ARP )
+//                {
+              ethernet_states = ARP;
+//                }
+            }
+//				if ( memcmp(ethernet_header->dest_mac,SA_MAC_Address,6 )==0){
+//
+//						    ethernet_states = IPV4;
+//						}
+//
+
+          else if( ETH_StatusPacketReceptionStruct.Fields.UCA)
+            {
+              PORT_WriteBit(MDR_PORTA, PORT_Pin_9,true);
+
+//          if ( ethernet_header->ethernet_type == ETH_TYPE_IPV4)
+//            {
+//              ethernet_states = IPV4;
+//            }
+            }
+//				else{
+//
+//
+//					 ethernet_states = LISTENING;
+//				}
         }
-      else if ( ethernet_header->ethernet_type == ETH_TYPE_IPV4)
-        {
-          ethernet_states = IPV4;
-        }
-    }
 
 
-  // Copy packet data into buffer
+      // Copy packet data into buffer
 //		packet.Status = ETH_ReceivedFrame(MDR_ETHERNET1, InputFrame);
 
-  // Unicast packet
+      // Unicast packet
 //		if( packet.Fields.UCA )
 //			 ProcessEthIAFrame(InputFrame, packet.Fields.Length);
-  // Broadcast packet
+      // Broadcast packet
 //		else if( packet.Fields.BCA )
 //			 ProcessEthBroadcastFrame(InputFrame, packet.Fields.Length);
 
-  NVIC_ClearPendingIRQ(ETHERNET_IRQn);
+//      NVIC_ClearPendingIRQ(ETHERNET_IRQn);
+    }
+
 }
-
-
 
 unsigned int ethernet_WriteRAM(void* buf, unsigned int size)
 {
