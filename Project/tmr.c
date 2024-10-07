@@ -13,10 +13,10 @@ void set_timer(void)
 
   TIMER_ITConfig(MDR_TIMER2, TIMER_STATUS_CNT_ARR, ENABLE);
   TIMER_CntInit(MDR_TIMER2, &TimerInit);
-	
-	TIMER_ClearITPendingBit(MDR_TIMER2, TIMER_STATUS_CNT_ARR);
+
+  TIMER_ClearITPendingBit(MDR_TIMER2, TIMER_STATUS_CNT_ARR);
   TIMER_SetCounter(MDR_TIMER2,0x0);
-	NVIC_EnableIRQ(TIMER2_IRQn );
+  NVIC_EnableIRQ(TIMER2_IRQn );
 //    TimerInit.TIMER_Period = 1750;
 //    TIMER_ITConfig(MDR_TIMER2, TIMER_STATUS_CNT_ARR, ENABLE);
 //    TIMER_CntInit(MDR_TIMER2, &TimerInit);
