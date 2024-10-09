@@ -166,12 +166,6 @@ int main(void)
 
     {
 
-//      if(data_received_flag)
-//        {
-//      get_ethernet_packet(input_frame);
-//          data_received_flag = false;
-//        }
-
       switch(ethernet_states)
         {
         case ARP:
@@ -207,9 +201,6 @@ int main(void)
 void get_ethernet_packet(uint32_t* packet)
 {
 
-//  if(ETH_GetMACITStatus(MDR_ETHERNET1,ETH_MAC_IT_RF_OK))
-//    {
-
   uint32_t Status;
   ETH_StatusPacketReceptionTypeDef ETH_StatusPacketReceptionStruct;
   ETH_StatusPacketReceptionStruct.Status =  ETH_ReceivedFrame(MDR_ETHERNET1,packet);
@@ -230,6 +221,10 @@ void get_ethernet_packet(uint32_t* packet)
         {
           ethernet_states = IPV4;
         }
+      else if ( ethernet_header->ethernet_type == ETH_TYPE_ARP )
+        {
+          ethernet_states = ARP;
+        }
     }
   else
     {
@@ -239,8 +234,6 @@ void get_ethernet_packet(uint32_t* packet)
 
 
 
-
-//}
 void arp(uint32_t* packet)
 {
 
@@ -260,7 +253,7 @@ void arp(uint32_t* packet)
           ethernet_header_s* tx_ethernet_header =(ethernet_header_s*) tx_byte_buffer;
           arp_packet_s* tx_arp_packet =(arp_packet_s*) (tx_byte_buffer+ETHERNET_HEADER_SIZE);
 
-          memcpy(tx_ethernet_header->dest_mac, DA_MAC_Address,6);
+          memcpy(tx_ethernet_header->dest_mac, rx_arp_packet->sender_mac,6);
           memcpy(tx_ethernet_header->source_mac,SA_MAC_Address,6);
           tx_ethernet_header->ethernet_type = ETH_TYPE_ARP;
 
@@ -278,10 +271,7 @@ void arp(uint32_t* packet)
           ETH_SendFrame(MDR_ETHERNET1,(uint32_t *)output_frame,*(uint32_t*)&output_frame[0]);
 
         }
-
-
     }
-
 
   ethernet_states = LISTENING;
 }
@@ -424,11 +414,6 @@ void icmp(uint32_t* packet)
 }
 
 
-
-
-
-
-
 uint32_t sum_udp_data(uint16_t* header,uint8_t length)
 {
 
@@ -461,8 +446,6 @@ uint16_t calc_crc16_udp(uint16_t* udp_pseudo_header,uint16_t udp_pseudo_header_l
 
 }
 
-
-
 uint16_t calc_crc16(uint16_t* header,uint8_t length)
 {
   uint32_t sum = 0;
@@ -481,8 +464,6 @@ uint16_t calc_crc16(uint16_t* header,uint8_t length)
       sum = (sum & 0xffff)+(sum>>16);
     }
 
-
-
   return ~((uint16_t)sum);
 
 }
@@ -490,10 +471,7 @@ uint16_t calc_crc16(uint16_t* header,uint8_t length)
 
 uint16_t switch_byte(uint16_t val)
 {
-
   return ((val>>8)|(val<<8));
-
-
 }
 
 void delay(uint32_t ticks)
@@ -529,15 +507,9 @@ void ETHERNET_IRQHandler(void)
 {
   if(ETH_GetMACITStatus(MDR_ETHERNET1,ETH_MAC_IT_RF_OK))
     {
-
       get_ethernet_packet(input_frame);
-
-
-
-
     }
 
-//  data_received_flag = true;
   NVIC_ClearPendingIRQ(ETHERNET_IRQn);
 
 }

@@ -3,7 +3,7 @@
 <title>Static Call Graph - [.\Objects\Ethernet.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image .\Objects\Ethernet.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6160001: Last Updated: Wed Oct  9 13:56:06 2024
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6160001: Last Updated: Wed Oct  9 15:17:58 2024
 <BR><P>
 <H3>Maximum Stack Usage =        304 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -659,7 +659,7 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[18]"></a>ETHERNET_IRQHandler</STRONG> (Thumb, 36 bytes, Stack size 8 bytes, main.o(.text.ETHERNET_IRQHandler))
-<BR><BR>[Stack]<UL><LI>Max Depth = 168<LI>Call Chain = ETHERNET_IRQHandler &rArr; get_ethernet_packet &rArr; ETH_ReceivedFrame &rArr; ETH_DMAFrameRx &rArr; DMA_Cmd
+<BR><BR>[Stack]<UL><LI>Max Depth = 176<LI>Call Chain = ETHERNET_IRQHandler &rArr; get_ethernet_packet &rArr; ETH_ReceivedFrame &rArr; ETH_DMAFrameRx &rArr; DMA_Cmd
 </UL>
 <BR>[Calls]<UL><LI><a href="#[4b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;get_ethernet_packet
 <LI><a href="#[4a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ETH_GetMACITStatus
@@ -976,7 +976,7 @@ Global Symbols
 <LI><a href="#[15]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TIMER2_IRQHandler
 </UL>
 
-<P><STRONG><a name="[68]"></a>arp</STRONG> (Thumb, 284 bytes, Stack size 56 bytes, main.o(.text.arp))
+<P><STRONG><a name="[68]"></a>arp</STRONG> (Thumb, 288 bytes, Stack size 56 bytes, main.o(.text.arp))
 <BR><BR>[Stack]<UL><LI>Max Depth = 152<LI>Call Chain = arp &rArr; ETH_SendFrame &rArr; ETH_DMAFrameTx &rArr; DMA_Cmd
 </UL>
 <BR>[Calls]<UL><LI><a href="#[34]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_memcpy
@@ -1002,8 +1002,8 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[6f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;udp
 </UL>
 
-<P><STRONG><a name="[4b]"></a>get_ethernet_packet</STRONG> (Thumb, 132 bytes, Stack size 32 bytes, main.o(.text.get_ethernet_packet))
-<BR><BR>[Stack]<UL><LI>Max Depth = 160<LI>Call Chain = get_ethernet_packet &rArr; ETH_ReceivedFrame &rArr; ETH_DMAFrameRx &rArr; DMA_Cmd
+<P><STRONG><a name="[4b]"></a>get_ethernet_packet</STRONG> (Thumb, 164 bytes, Stack size 40 bytes, main.o(.text.get_ethernet_packet))
+<BR><BR>[Stack]<UL><LI>Max Depth = 168<LI>Call Chain = get_ethernet_packet &rArr; ETH_ReceivedFrame &rArr; ETH_DMAFrameRx &rArr; DMA_Cmd
 </UL>
 <BR>[Calls]<UL><LI><a href="#[69]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;switch_byte
 <LI><a href="#[58]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ETH_ReceivedFrame
