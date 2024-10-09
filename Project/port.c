@@ -30,6 +30,15 @@ void set_port(void)
   PortInit.PORT_OE = PORT_OE_IN;
   PortInit.PORT_Pin = PORT_Pin_9;
   PORT_Init(MDR_PORTD, &PortInit);
+	
+	PortInit.PORT_MODE = PORT_MODE_DIGITAL;
+	PortInit.PORT_FUNC = PORT_FUNC_PORT;
+  PortInit.PORT_OE = PORT_OE_OUT;
+  PortInit.PORT_Pin = PORT_Pin_6;
+	
+  PORT_Init(MDR_PORTE, &PortInit);
+  PortInit.PORT_Pin = PORT_Pin_7;
+  PORT_Init(MDR_PORTE, &PortInit);
 
 
 }

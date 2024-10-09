@@ -163,21 +163,22 @@ int main(void)
 
 
   while(1)
+  
+  {
 
-    {
+  ethernet_PHY_Status();
+    switch(ethernet_states)
+      {
+      case ARP:
+        arp(input_frame);
+        break;
+      case IPV4:
+        ipv_4(input_frame);
+        break;
+      case LISTENING:
+        break;
 
-      switch(ethernet_states)
-        {
-        case ARP:
-          arp(input_frame);
-          break;
-        case IPV4:
-          ipv_4(input_frame);
-          break;
-        case LISTENING:
-          break;
-
-        }
+      }
 
 
 //      if(timer_flag)
@@ -192,7 +193,7 @@ int main(void)
 //          TIMER_Cmd(MDR_TIMER2, ENABLE);
 //        }
 
-    }
+  }
 
 }
 

@@ -37,3 +37,12 @@ void set_ethernet(void)
   ETH_Start(MDR_ETHERNET1);
 
 }
+void ethernet_PHY_Status(void)
+{		
+if(!(MDR_ETHERNET1->PHY_Status & ETH_PHY_STATUS_LED1)) PORT_SetBits(MDR_PORTE,PORT_Pin_6);
+	else PORT_ResetBits(MDR_PORTE,PORT_Pin_6);
+
+if(!(MDR_ETHERNET1->PHY_Status & ETH_PHY_STATUS_LED3)) PORT_SetBits(MDR_PORTE,PORT_Pin_7);
+	 else PORT_ResetBits(MDR_PORTE,PORT_Pin_7);	
+	
+}

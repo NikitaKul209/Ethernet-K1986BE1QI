@@ -163,7 +163,7 @@ int main(void)
 
 
   while(1)
-
+ethernet_PHY_Status();
     {
 
       switch(ethernet_states)
@@ -221,7 +221,7 @@ void get_ethernet_packet(uint32_t* packet)
         {
           ethernet_states = IPV4;
         }
-				    else if ( ethernet_header->ethernet_type == ETH_TYPE_ARP )
+      else if ( ethernet_header->ethernet_type == ETH_TYPE_ARP )
         {
           ethernet_states = ARP;
         }

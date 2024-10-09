@@ -12,6 +12,6 @@
 //extern uint8_t DA_IP_Address[4];
 //extern uint8_t SA_IP_Address[4];
 void set_ethernet(void);
-
+void ethernet_PHY_Status(void);
 
 #endif
