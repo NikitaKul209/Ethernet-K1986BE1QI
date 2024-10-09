@@ -32,7 +32,7 @@ void set_ethernet(void)
   ETH_InitStruct.ETH_Dilimiter = 0x1000;
   ETH_Init(MDR_ETHERNET1, (ETH_InitTypeDef *) &ETH_InitStruct);
   ETH_MACITConfig(MDR_ETHERNET1, ETH_MAC_IT_RF_OK, ENABLE);
-//  NVIC_EnableIRQ(ETHERNET_IRQn);
+  NVIC_EnableIRQ(ETHERNET_IRQn);
   ETH_PHYCmd(MDR_ETHERNET1, ENABLE);
   ETH_Start(MDR_ETHERNET1);
 
