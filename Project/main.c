@@ -5,8 +5,8 @@ extern uint8_t DA_MAC_Address[6];
 extern uint8_t SA_MAC_Address[6];
 extern uint8_t SA_IP_Address[4];
 extern uint8_t DA_IP_Address[4];
-uint32_t output_frame [150]  ;
-uint32_t input_frame [150]   ;
+uint32_t output_frame [1522]  ;
+uint32_t input_frame [1522]   ;
 
 
 bool data_received_flag = false;
@@ -56,6 +56,9 @@ uint16_t calc_crc16_udp(uint16_t* udp_pseudo_header,uint16_t udp_pseudo_header_l
 #define UDP_PSEUDO_HEADER_SIZE 20
 #define UDP_DATA_SIZE 64
 
+uint16_t udp_data_counter;
+uint8_t* udp_data_p =(uint8_t*)output_frame+ETHERNET_HEADER_SIZE+IP_HEADER_SIZE+UDP_HEADER_SIZE;
+bool udp_data_ready = false;
 
 typedef struct
 {
@@ -363,10 +366,21 @@ void udp(uint32_t* packet)
   pseudo_udp_header->udp_header = *tx_udp_packet;
 
   //add udp_data
+	while(!udp_data_ready)
 
   tx_udp_packet->crc = calc_crc16_udp((uint16_t*)pseudo_udp_header,UDP_PSEUDO_HEADER_SIZE,(uint16_t*)tx_byte_buffer+ETHERNET_HEADER_SIZE+IP_HEADER_SIZE+UDP_HEADER_SIZE, UDP_DATA_SIZE);
   output_frame[0]= ETHERNET_HEADER_SIZE+IP_HEADER_SIZE+UDP_HEADER_SIZE+UDP_DATA_SIZE;
   ETH_SendFrame(MDR_ETHERNET1,(uint32_t *)output_frame,*(uint32_t*)&output_frame[0]);
+
+
+}
+
+
+void add_udp_data(uint8_t* output_data){
+	
+	
+	
+	
 
 
 }
@@ -495,10 +509,34 @@ void ADC_IRQHandler (void)
   if (ADC1_GetITStatus(ADC1_IT_END_OF_CONVERSION)==SET)
 
     {
+			if(udp_data_counter < 1000){
+				udp_data_ready = false;
+			
       uint16_t adc_val = ADC1_GetResult();
       float voltage = adc_val;
       voltage = voltage /4096*3.3;
+			*udp_data_p++ = voltage;
       ADC1_Start();
+			udp_data_counter++;
+			
+			
+			}
+			else{
+			
+				 uint16_t adc_val = ADC1_GetResult();
+      float voltage = adc_val;
+      voltage = voltage /4096*3.3;
+			*udp_data_p++ = voltage;
+      ADC1_Start();
+				
+				
+			udp_data_counter = 0;
+			udp_data_p =(uint8_t*)output_frame+ETHERNET_HEADER_SIZE+IP_HEADER_SIZE+UDP_HEADER_SIZE;
+				udp_data_ready = true;
+			
+			}
+	
+
 
     }
 
