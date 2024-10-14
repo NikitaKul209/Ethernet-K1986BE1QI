@@ -140,7 +140,7 @@
         <SetRegEntry>
           <Number>0</Number>
           <Key>UL2CM3</Key>
-          <Name>-UV0020RIE -O1806 -S0 -C0 -P00 -N00("ARM CoreSight JTAG-DP") -D00(4BA00477) -L00(4) -TO65554 -TC10000000 -TT10000000 -TP21 -TDS8007 -TDT0 -TDC1F -TIEFFFFFFFF -TIP8 -FO31 -FD20100000 -FC4000 -FN1 -FF01986BE1T.FLM -FS00 -FL020000 -FP0($$Device:MDR1986BE1T$Flash\MDR1986VE1\1986BE1T.FLM)</Name>
+          <Name>-UV0020RIE -O14 -S0 -C0 -P00 -N00("ARM CoreSight JTAG-DP") -D00(4BA00477) -L00(4) -TO65554 -TC10000000 -TT10000000 -TP21 -TDS8007 -TDT0 -TDC1F -TIEFFFFFFFF -TIP8 -FO31 -FD20100000 -FC4000 -FN1 -FF01986BE1T.FLM -FS00 -FL020000 -FP0($$Device:MDR1986BE1T$Flash\MDR1986VE1\1986BE1T.FLM)</Name>
         </SetRegEntry>
       </TargetDriverDllRegistry>
       <Breakpoint>
@@ -163,22 +163,6 @@
         <Bp>
           <Number>1</Number>
           <Type>0</Type>
-          <LineNumber>339</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>10254</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>.\main.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\Ethernet\main.c\339</Expression>
-        </Bp>
-        <Bp>
-          <Number>2</Number>
-          <Type>0</Type>
           <LineNumber>3</LineNumber>
           <EnabledFlag>1</EnabledFlag>
           <Address>0</Address>
@@ -193,7 +177,7 @@
           <Expression></Expression>
         </Bp>
         <Bp>
-          <Number>3</Number>
+          <Number>2</Number>
           <Type>0</Type>
           <LineNumber>3</LineNumber>
           <EnabledFlag>1</EnabledFlag>
@@ -209,7 +193,7 @@
           <Expression></Expression>
         </Bp>
         <Bp>
-          <Number>4</Number>
+          <Number>3</Number>
           <Type>0</Type>
           <LineNumber>3</LineNumber>
           <EnabledFlag>1</EnabledFlag>
@@ -225,7 +209,7 @@
           <Expression></Expression>
         </Bp>
         <Bp>
-          <Number>5</Number>
+          <Number>4</Number>
           <Type>0</Type>
           <LineNumber>3</LineNumber>
           <EnabledFlag>1</EnabledFlag>
@@ -241,7 +225,7 @@
           <Expression></Expression>
         </Bp>
         <Bp>
-          <Number>6</Number>
+          <Number>5</Number>
           <Type>0</Type>
           <LineNumber>3</LineNumber>
           <EnabledFlag>1</EnabledFlag>
@@ -257,23 +241,7 @@
           <Expression></Expression>
         </Bp>
         <Bp>
-          <Number>7</Number>
-          <Type>0</Type>
-          <LineNumber>3</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>0</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>0</BreakIfRCount>
-          <Filename>.\ethernet.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression></Expression>
-        </Bp>
-        <Bp>
-          <Number>8</Number>
+          <Number>6</Number>
           <Type>0</Type>
           <LineNumber>3</LineNumber>
           <EnabledFlag>1</EnabledFlag>
@@ -289,39 +257,7 @@
           <Expression></Expression>
         </Bp>
         <Bp>
-          <Number>9</Number>
-          <Type>0</Type>
-          <LineNumber>337</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>0</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>0</BreakIfRCount>
-          <Filename>.\main.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression></Expression>
-        </Bp>
-        <Bp>
-          <Number>10</Number>
-          <Type>0</Type>
-          <LineNumber>340</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>0</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>0</BreakIfRCount>
-          <Filename>.\main.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression></Expression>
-        </Bp>
-        <Bp>
-          <Number>11</Number>
+          <Number>7</Number>
           <Type>0</Type>
           <LineNumber>3</LineNumber>
           <EnabledFlag>1</EnabledFlag>
@@ -337,7 +273,7 @@
           <Expression></Expression>
         </Bp>
         <Bp>
-          <Number>12</Number>
+          <Number>8</Number>
           <Type>0</Type>
           <LineNumber>3</LineNumber>
           <EnabledFlag>1</EnabledFlag>
@@ -353,7 +289,7 @@
           <Expression></Expression>
         </Bp>
         <Bp>
-          <Number>13</Number>
+          <Number>9</Number>
           <Type>0</Type>
           <LineNumber>3</LineNumber>
           <EnabledFlag>1</EnabledFlag>
@@ -369,7 +305,7 @@
           <Expression></Expression>
         </Bp>
         <Bp>
-          <Number>14</Number>
+          <Number>10</Number>
           <Type>0</Type>
           <LineNumber>3</LineNumber>
           <EnabledFlag>1</EnabledFlag>
@@ -385,7 +321,7 @@
           <Expression></Expression>
         </Bp>
         <Bp>
-          <Number>15</Number>
+          <Number>11</Number>
           <Type>0</Type>
           <LineNumber>3</LineNumber>
           <EnabledFlag>1</EnabledFlag>
@@ -397,38 +333,6 @@
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>0</BreakIfRCount>
           <Filename>.\tmr.h</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression></Expression>
-        </Bp>
-        <Bp>
-          <Number>16</Number>
-          <Type>0</Type>
-          <LineNumber>342</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>0</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>0</BreakIfRCount>
-          <Filename>.\main.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression></Expression>
-        </Bp>
-        <Bp>
-          <Number>17</Number>
-          <Type>0</Type>
-          <LineNumber>343</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>0</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>0</BreakIfRCount>
-          <Filename>.\main.c</Filename>
           <ExecCommand></ExecCommand>
           <Expression></Expression>
         </Bp>
@@ -483,6 +387,11 @@
           <count>9</count>
           <WinNumber>1</WinNumber>
           <ItemText>SA_IP_Address</ItemText>
+        </Ww>
+        <Ww>
+          <count>10</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>voltage</ItemText>
         </Ww>
       </WatchWindow1>
       <MemoryWindow1>
