@@ -8,7 +8,7 @@ extern uint8_t DA_IP_Address[4];
 uint32_t output_frame [1522]  ;
 uint32_t input_frame [1522]   ;
 uint32_t tx_udp_frame[1522];
-
+uint16_t adc_data[8000];
 bool data_received_flag = false;
 void arp(uint32_t* packet);
 uint16_t calc_crc16(uint16_t* ipv4_header, uint8_t length);
@@ -54,7 +54,9 @@ uint16_t calc_crc16_udp(uint16_t* udp_pseudo_header,uint16_t udp_pseudo_header_l
 #define UDP_DATA_SIZE 1000
 
 uint16_t udp_data_counter;
-uint16_t* udp_data_p =(uint16_t*)tx_udp_frame+(TX_PACKAGE_CONTROL_FIELD+ETHERNET_HEADER_SIZE+IP_HEADER_SIZE+UDP_HEADER_SIZE)/2;
+uint16_t adc_data_counter;
+uint16_t* adc_data_p = adc_data;
+uint16_t* udp_data_p = (uint16_t*)tx_udp_frame+(TX_PACKAGE_CONTROL_FIELD+ETHERNET_HEADER_SIZE+IP_HEADER_SIZE+UDP_HEADER_SIZE)/2;
 bool udp_data_ready = false;
 
 typedef struct
@@ -167,7 +169,7 @@ int main(void)
 
     {
 
-      ethernet_PHY_Status();
+//      ethernet_PHY_Status();
       switch(ethernet_states)
         {
         case ARP:
@@ -319,10 +321,10 @@ void ipv_4(uint32_t* packet)
               udp(input_frame);
 
             }
-						 else
-        {
-          ethernet_states = LISTENING;
-        }
+          else
+            {
+              ethernet_states = LISTENING;
+            }
         }
       else
         {
@@ -386,12 +388,22 @@ void udp(uint32_t* packet)
   pseudo_udp_header->udp_header = *tx_udp_packet;
 
   //add udp_data
-  while(!udp_data_ready) {};
 
-  tx_udp_packet->crc = calc_crc16_udp((uint16_t*)pseudo_udp_header,UDP_PSEUDO_HEADER_SIZE,(uint16_t*)tx_byte_buffer+ETHERNET_HEADER_SIZE+IP_HEADER_SIZE+UDP_HEADER_SIZE, UDP_DATA_SIZE);
+  while(!udp_data_ready) {};
+		PORT_SetBits(MDR_PORTE,PORT_Pin_7);
+		for (int i = 0;i<16;i++){
+			  tx_udp_packet->crc = 0;
+			memcpy((uint8_t*)tx_udp_frame+(TX_PACKAGE_CONTROL_FIELD+ETHERNET_HEADER_SIZE+IP_HEADER_SIZE+UDP_HEADER_SIZE),(uint8_t*)udp_data_p+(i*1000),UDP_DATA_SIZE);
+			  tx_udp_packet->crc = calc_crc16_udp((uint16_t*)pseudo_udp_header,UDP_PSEUDO_HEADER_SIZE,(uint16_t*)tx_byte_buffer+(ETHERNET_HEADER_SIZE+IP_HEADER_SIZE+UDP_HEADER_SIZE)/2, UDP_DATA_SIZE);
   tx_udp_frame[0]= ETHERNET_HEADER_SIZE+IP_HEADER_SIZE+UDP_HEADER_SIZE+UDP_DATA_SIZE;
   ETH_SendFrame(MDR_ETHERNET1,(uint32_t *)tx_udp_frame,*(uint32_t*)&tx_udp_frame[0]);
-ethernet_states = LISTENING;
+
+		
+		
+		}
+			PORT_ResetBits(MDR_PORTE,PORT_Pin_7);
+  ethernet_states = LISTENING;
+
 }
 
 
@@ -406,6 +418,7 @@ void add_udp_data(uint8_t* output_data)
 }
 void icmp(uint32_t* packet)
 {
+	
 
   uint8_t* rx_byte_buffer = (uint8_t*)packet;
   ethernet_header_s* rx_ethernet_header = (ethernet_header_s*)rx_byte_buffer;
@@ -530,35 +543,31 @@ void ADC_IRQHandler (void)
 
   if (ADC1_GetITStatus(ADC1_IT_END_OF_CONVERSION)==SET)
 
-    {
+    { 
+			if (adc_data_counter == 0){
+				PORT_SetBits(MDR_PORTE,PORT_Pin_6);
+			}
 
       udp_data_ready = false;
       uint16_t adc_val = ADC1_GetResult();
       float voltage = adc_val;
       voltage = voltage /4096*3.3*100;
-      udp_data_p[udp_data_counter++] = switch_byte(voltage);
-      ADC1_Start();
-      if(udp_data_counter == 100)
+      adc_data_p[adc_data_counter++] = switch_byte(voltage);
+      if(adc_data_counter == 8000)
         {
-          udp_data_counter = 0;
-          udp_data_p =(uint16_t*)tx_udp_frame+(TX_PACKAGE_CONTROL_FIELD+ETHERNET_HEADER_SIZE+IP_HEADER_SIZE+UDP_HEADER_SIZE)/2;
+          adc_data_counter = 0;
+					
+//          udp_data_p =(uint16_t*)tx_udp_frame+(TX_PACKAGE_CONTROL_FIELD+ETHERNET_HEADER_SIZE+IP_HEADER_SIZE+UDP_HEADER_SIZE)/2;
           udp_data_ready = true;
+					NVIC_DisableIRQ(ADC_IRQn);
+					ADC1_Cmd(DISABLE);
+					PORT_ResetBits(MDR_PORTE,PORT_Pin_6);
+					return;
+
+					
         }
-//      else
-//        {
-//					udp_data_ready = false;
-//          uint16_t adc_val = ADC1_GetResult();
-//          float voltage = adc_val;
-//          voltage = voltage /4096*3.3*100;
-//           udp_data_p[udp_data_counter++] = switch_byte(voltage);
 
-
-
-//					          ADC1_Start();
-
-//        }
-
-
+				ADC1_Start();
 
     }
   MDR_ADC->ADC1_STATUS = (ADCx_IT_END_OF_CONVERSION | ADCx_IT_OUT_OF_RANGE)<<2;
