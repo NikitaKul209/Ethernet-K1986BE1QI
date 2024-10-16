@@ -362,7 +362,7 @@
             </VariousControls>
           </Aads>
           <LDads>
-            <umfTarg>1</umfTarg>
+            <umfTarg>0</umfTarg>
             <Ropi>0</Ropi>
             <Rwpi>0</Rwpi>
             <noStLib>0</noStLib>
@@ -444,6 +444,16 @@
               <FileType>5</FileType>
               <FilePath>.\adc.h</FilePath>
             </File>
+            <File>
+              <FileName>spi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\spi.c</FilePath>
+            </File>
+            <File>
+              <FileName>spi.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\spi.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -496,6 +506,12 @@
         </targetInfos>
       </component>
       <component Cclass="Drivers" Cgroup="RST_CLK" Cvendor="Keil" Cversion="2.0.3" condition="CON_MDR32F9">
+        <package name="MDR1986BExx" schemaVersion="1.2" url="https://ic.milandr.ru/soft/" vendor="Keil" version="2.0.3"/>
+        <targetInfos>
+          <targetInfo name="Target 1"/>
+        </targetInfos>
+      </component>
+      <component Cclass="Drivers" Cgroup="SSP" Cvendor="Keil" Cversion="2.0.3" condition="CON_MDR32F9">
         <package name="MDR1986BExx" schemaVersion="1.2" url="https://ic.milandr.ru/soft/" vendor="Keil" version="2.0.3"/>
         <targetInfos>
           <targetInfo name="Target 1"/>

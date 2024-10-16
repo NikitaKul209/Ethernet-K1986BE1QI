@@ -39,6 +39,13 @@ void set_port(void)
   PORT_Init(MDR_PORTE, &PortInit);
   PortInit.PORT_Pin = PORT_Pin_7;
   PORT_Init(MDR_PORTE, &PortInit);
+	
+	
+	
+	//FSS
+	  PORT_Init(MDR_PORTE, &PortInit);
+  PortInit.PORT_Pin = PORT_Pin_15;
+  PORT_Init(MDR_PORTE, &PortInit);
 
 
 }

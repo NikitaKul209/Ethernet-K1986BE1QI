@@ -14,12 +14,12 @@ void set_ethernet(void)
   ETH_InitTypeDef ETH_InitStruct;
   ETH_DeInit(MDR_ETHERNET1);
   ETH_StructInit((ETH_InitTypeDef *) &ETH_InitStruct);
-	
-	ETH_InitStruct.ETH_Error_CRC_Frames_Reception = DISABLE;
+
+  ETH_InitStruct.ETH_Error_CRC_Frames_Reception = DISABLE;
 
   ETH_InitStruct.ETH_Receive_All_Packets = DISABLE;
   ETH_InitStruct.ETH_Unicast_Frames_Reception = ENABLE;
-	
+
   ETH_InitStruct.ETH_PHY_Mode = ETH_PHY_MODE_AutoNegotiation;
   ETH_InitStruct.ETH_Transmitter_RST = SET;
   ETH_InitStruct.ETH_Receiver_RST = SET;
@@ -38,11 +38,11 @@ void set_ethernet(void)
 
 }
 void ethernet_PHY_Status(void)
-{		
-if(!(MDR_ETHERNET1->PHY_Status & ETH_PHY_STATUS_LED1)) PORT_SetBits(MDR_PORTE,PORT_Pin_6);
-	else PORT_ResetBits(MDR_PORTE,PORT_Pin_6);
+{
+  if(!(MDR_ETHERNET1->PHY_Status & ETH_PHY_STATUS_LED1)) PORT_SetBits(MDR_PORTE,PORT_Pin_6);
+  else PORT_ResetBits(MDR_PORTE,PORT_Pin_6);
 
-if(!(MDR_ETHERNET1->PHY_Status & ETH_PHY_STATUS_LED3)) PORT_SetBits(MDR_PORTE,PORT_Pin_7);
-	 else PORT_ResetBits(MDR_PORTE,PORT_Pin_7);	
-	
+  if(!(MDR_ETHERNET1->PHY_Status & ETH_PHY_STATUS_LED3)) PORT_SetBits(MDR_PORTE,PORT_Pin_7);
+  else PORT_ResetBits(MDR_PORTE,PORT_Pin_7);
+
 }

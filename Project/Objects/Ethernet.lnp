@@ -5,6 +5,7 @@
 ".\objects\ethernet.o"
 ".\objects\tmr.o"
 ".\objects\adc.o"
+".\objects\spi.o"
 ".\objects\startup_mdr1986ve1t.o"
 ".\objects\system_mdr1986ve1t.o"
 ".\objects\mdr32f9qx_adc.o"
@@ -16,6 +17,7 @@
 ".\objects\mdr32f9qx_rst_clk.o"
 ".\objects\mdr32f9qx_timer.o"
 ".\objects\mdr32f9qx_uart.o"
+".\objects\mdr32f9qx_ssp.o"
 --strict --scatter ".\Objects\Ethernet.sct"
 --summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
 --info sizes --info totals --info unused --info veneers

@@ -19,7 +19,7 @@
 #include "ethernet.h"
 #include "tmr.h"
 #include "adc.h"
-
+#include "spi.h"
 
 void delay(uint32_t ticks);
 
