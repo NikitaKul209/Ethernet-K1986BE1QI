@@ -3,7 +3,7 @@
 <title>Static Call Graph - [.\Objects\Ethernet.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image .\Objects\Ethernet.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6160001: Last Updated: Wed Oct 16 16:38:01 2024
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6160001: Last Updated: Fri Oct 18 14:33:01 2024
 <BR><P>
 <H3>Maximum Stack Usage =        304 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -863,7 +863,7 @@ Global Symbols
 <BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = PORT_ResetBits
 </UL>
 <BR>[Called By]<UL><LI><a href="#[76]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;udp
-<LI><a href="#[72]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;spi_transfer
+<LI><a href="#[72]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;spi_transfer2
 <LI><a href="#[17]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ADC_IRQHandler
 </UL>
 
@@ -871,7 +871,7 @@ Global Symbols
 <BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = PORT_SetBits
 </UL>
 <BR>[Called By]<UL><LI><a href="#[76]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;udp
-<LI><a href="#[72]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;spi_transfer
+<LI><a href="#[72]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;spi_transfer2
 <LI><a href="#[17]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ADC_IRQHandler
 </UL>
 
@@ -990,7 +990,7 @@ Global Symbols
 <P><STRONG><a name="[9d]"></a>SSP_GetFlagStatus</STRONG> (Thumb, 50 bytes, Stack size 16 bytes, mdr32f9qx_ssp.o(.text.SSP_GetFlagStatus))
 <BR><BR>[Stack]<UL><LI>Max Depth = 16<LI>Call Chain = SSP_GetFlagStatus
 </UL>
-<BR>[Called By]<UL><LI><a href="#[72]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;spi_transfer
+<BR>[Called By]<UL><LI><a href="#[72]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;spi_transfer2
 </UL>
 
 <P><STRONG><a name="[96]"></a>SSP_Init</STRONG> (Thumb, 64 bytes, Stack size 12 bytes, mdr32f9qx_ssp.o(.text.SSP_Init))
@@ -1002,13 +1002,13 @@ Global Symbols
 <P><STRONG><a name="[9e]"></a>SSP_ReceiveData</STRONG> (Thumb, 14 bytes, Stack size 4 bytes, mdr32f9qx_ssp.o(.text.SSP_ReceiveData))
 <BR><BR>[Stack]<UL><LI>Max Depth = 4<LI>Call Chain = SSP_ReceiveData
 </UL>
-<BR>[Called By]<UL><LI><a href="#[72]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;spi_transfer
+<BR>[Called By]<UL><LI><a href="#[72]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;spi_transfer2
 </UL>
 
 <P><STRONG><a name="[9c]"></a>SSP_SendData</STRONG> (Thumb, 18 bytes, Stack size 8 bytes, mdr32f9qx_ssp.o(.text.SSP_SendData))
 <BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = SSP_SendData
 </UL>
-<BR>[Called By]<UL><LI><a href="#[72]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;spi_transfer
+<BR>[Called By]<UL><LI><a href="#[72]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;spi_transfer2
 </UL>
 
 <P><STRONG><a name="[95]"></a>SSP_StructInit</STRONG> (Thumb, 46 bytes, Stack size 4 bytes, mdr32f9qx_ssp.o(.text.SSP_StructInit))
@@ -1119,10 +1119,10 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[76]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;udp
 </UL>
 
-<P><STRONG><a name="[71]"></a>collect_spi_data</STRONG> (Thumb, 108 bytes, Stack size 48 bytes, main.o(.text.collect_spi_data))
-<BR><BR>[Stack]<UL><LI>Max Depth = 88<LI>Call Chain = collect_spi_data &rArr; spi_transfer &rArr; SSP_GetFlagStatus
+<P><STRONG><a name="[71]"></a>collect_spi_data2</STRONG> (Thumb, 52 bytes, Stack size 16 bytes, main.o(.text.collect_spi_data2))
+<BR><BR>[Stack]<UL><LI>Max Depth = 72<LI>Call Chain = collect_spi_data2 &rArr; spi_transfer2 &rArr; SSP_GetFlagStatus
 </UL>
-<BR>[Calls]<UL><LI><a href="#[72]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;spi_transfer
+<BR>[Calls]<UL><LI><a href="#[72]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;spi_transfer2
 </UL>
 <BR>[Called By]<UL><LI><a href="#[2e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
@@ -1167,7 +1167,7 @@ Global Symbols
 <LI><a href="#[77]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;set_clk
 <LI><a href="#[7b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;set_adc
 <LI><a href="#[75]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ipv_4
-<LI><a href="#[71]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;collect_spi_data
+<LI><a href="#[71]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;collect_spi_data2
 <LI><a href="#[6e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;arp
 </UL>
 <BR>[Called By]<UL><LI><a href="#[2d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__rt_entry_main
@@ -1185,8 +1185,8 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[2e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[77]"></a>set_clk</STRONG> (Thumb, 236 bytes, Stack size 32 bytes, clk.o(.text.set_clk))
-<BR><BR>[Stack]<UL><LI>Max Depth = 68<LI>Call Chain = set_clk &rArr; RST_CLK_HSEstatus &rArr; RST_CLK_GetFlagStatus
+<P><STRONG><a name="[77]"></a>set_clk</STRONG> (Thumb, 240 bytes, Stack size 40 bytes, clk.o(.text.set_clk))
+<BR><BR>[Stack]<UL><LI>Max Depth = 76<LI>Call Chain = set_clk &rArr; RST_CLK_HSEstatus &rArr; RST_CLK_GetFlagStatus
 </UL>
 <BR>[Calls]<UL><LI><a href="#[87]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TIMER_BRGInit
 <LI><a href="#[8a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSP_BRGInit
@@ -1225,16 +1225,16 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[2e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[79]"></a>set_port</STRONG> (Thumb, 160 bytes, Stack size 48 bytes, port.o(.text.set_port))
-<BR><BR>[Stack]<UL><LI>Max Depth = 112<LI>Call Chain = set_port &rArr; PORT_Init
+<P><STRONG><a name="[79]"></a>set_port</STRONG> (Thumb, 204 bytes, Stack size 56 bytes, port.o(.text.set_port))
+<BR><BR>[Stack]<UL><LI>Max Depth = 120<LI>Call Chain = set_port &rArr; PORT_Init
 </UL>
 <BR>[Calls]<UL><LI><a href="#[93]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PORT_Init
 </UL>
 <BR>[Called By]<UL><LI><a href="#[2e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[7c]"></a>set_spi</STRONG> (Thumb, 64 bytes, Stack size 16 bytes, spi.o(.text.set_spi))
-<BR><BR>[Stack]<UL><LI>Max Depth = 28<LI>Call Chain = set_spi &rArr; SSP_Init
+<P><STRONG><a name="[7c]"></a>set_spi</STRONG> (Thumb, 68 bytes, Stack size 24 bytes, spi.o(.text.set_spi))
+<BR><BR>[Stack]<UL><LI>Max Depth = 36<LI>Call Chain = set_spi &rArr; SSP_Init
 </UL>
 <BR>[Calls]<UL><LI><a href="#[95]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSP_StructInit
 <LI><a href="#[96]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSP_Init
@@ -1257,8 +1257,8 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[2e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[72]"></a>spi_transfer</STRONG> (Thumb, 128 bytes, Stack size 24 bytes, spi.o(.text.spi_transfer))
-<BR><BR>[Stack]<UL><LI>Max Depth = 40<LI>Call Chain = spi_transfer &rArr; SSP_GetFlagStatus
+<P><STRONG><a name="[72]"></a>spi_transfer2</STRONG> (Thumb, 144 bytes, Stack size 40 bytes, spi.o(.text.spi_transfer2))
+<BR><BR>[Stack]<UL><LI>Max Depth = 56<LI>Call Chain = spi_transfer2 &rArr; SSP_GetFlagStatus
 </UL>
 <BR>[Calls]<UL><LI><a href="#[9c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSP_SendData
 <LI><a href="#[9e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SSP_ReceiveData
@@ -1266,7 +1266,7 @@ Global Symbols
 <LI><a href="#[40]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PORT_SetBits
 <LI><a href="#[4a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PORT_ResetBits
 </UL>
-<BR>[Called By]<UL><LI><a href="#[71]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;collect_spi_data
+<BR>[Called By]<UL><LI><a href="#[71]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;collect_spi_data2
 </UL>
 
 <P><STRONG><a name="[70]"></a>sum_udp_data</STRONG> (Thumb, 60 bytes, Stack size 16 bytes, main.o(.text.sum_udp_data))

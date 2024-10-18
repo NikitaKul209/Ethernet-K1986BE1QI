@@ -14,7 +14,8 @@ bool data_received_flag = false;
 void arp(uint32_t* packet);
 uint16_t calc_crc16(uint16_t* ipv4_header, uint8_t length);
 void get_ethernet_packet(uint32_t* packet);
-void collect_spi_data(uint16_t*spi_data_buff);
+//void collect_spi_data(uint16_t*spi_data_buff);
+void collect_spi_data2(uint16_t*spi_data_buff);
 uint16_t switch_byte(uint16_t val);
 bool  timer_flag = false;
 void ipv_4(uint32_t* packet);
@@ -157,8 +158,8 @@ int main(void)
   set_adc();
 	set_spi();
 
+//CONV_LOW
 
- collect_spi_data(adc_data);
 
   ethernet_states = LISTENING;
 
@@ -169,14 +170,14 @@ int main(void)
 //for ( int i = 0; i<8000;i++){
 
 //adc_data_p[i] = switch_byte(i);
-
+ collect_spi_data2(adc_data);
 //}
   while(1)
 
     {
 
 //      ethernet_PHY_Status();
-     
+//     spi_transfer(MDR_SSP1,0xAA);
       switch(ethernet_states)
         {
         case ARP:
@@ -419,21 +420,33 @@ void udp(uint32_t* packet)
   ethernet_states = LISTENING;
 
 }
-void collect_spi_data(uint16_t*spi_data_buff)
-{
-  uint16_t adc_val;
-  uint8_t  adc_val_low;
-  uint8_t adc_val_high;
-  uint8_t tmp;
+
+void collect_spi_data2(uint16_t*spi_data_buff){
+
+
   for (int i =0 ; i<8000/2; i++)
     {
-      adc_val_low = spi_transfer(MDR_SSP1,0xAA);
-      adc_val_high = spi_transfer(MDR_SSP1,0xAA);
-      tmp = spi_transfer(MDR_SSP1,0xAA);
-      adc_val = adc_val_low | adc_val_high<<8;
-      spi_data_buff[i] = adc_val;
+ spi_data_buff[i] = spi_transfer2(MDR_SSP1,0xAA);
+ 
     }
+
+
 }
+//void collect_spi_data(uint16_t*spi_data_buff)
+//{
+//  uint16_t adc_val;
+//  uint8_t  adc_val_low;
+//  uint8_t adc_val_high;
+//  uint8_t tmp;
+//  for (int i =0 ; i<8000/2; i++)
+//    {
+//      adc_val_low = spi_transfer(MDR_SSP1,0xAA);
+//      adc_val_high = spi_transfer(MDR_SSP1,0xAA);
+//      tmp = spi_transfer(MDR_SSP1,0xAA);
+//      adc_val = adc_val_low | adc_val_high<<8;
+//      spi_data_buff[i] = adc_val;
+//    }
+//}
 
 void add_udp_data(uint8_t* output_data)
 {

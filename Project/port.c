@@ -25,11 +25,11 @@ void set_port(void)
   PortInit.PORT_Pin = PORT_Pin_12;
   PORT_Init(MDR_PORTD, &PortInit);
 
-  PortInit.PORT_MODE = PORT_MODE_ANALOG;
-  PortInit.PORT_FUNC = PORT_FUNC_PORT;
-  PortInit.PORT_OE = PORT_OE_IN;
-  PortInit.PORT_Pin = PORT_Pin_9;
-  PORT_Init(MDR_PORTD, &PortInit);
+//  PortInit.PORT_MODE = PORT_MODE_ANALOG;
+//  PortInit.PORT_FUNC = PORT_FUNC_PORT;
+//  PortInit.PORT_OE = PORT_OE_IN;
+//  PortInit.PORT_Pin = PORT_Pin_9;
+//  PORT_Init(MDR_PORTD, &PortInit);
 	
 	PortInit.PORT_MODE = PORT_MODE_DIGITAL;
 	PortInit.PORT_FUNC = PORT_FUNC_PORT;
@@ -42,10 +42,24 @@ void set_port(void)
 	
 	
 	
-	//FSS
-	  PORT_Init(MDR_PORTE, &PortInit);
+//FSS
+	PortInit.PORT_FUNC = PORT_FUNC_PORT;
+	PORT_Init(MDR_PORTE, &PortInit);
   PortInit.PORT_Pin = PORT_Pin_15;
   PORT_Init(MDR_PORTE, &PortInit);
-
-
+//TX
+  PortInit.PORT_FUNC = PORT_FUNC_ALTER;
+  PortInit.PORT_OE = PORT_OE_OUT;
+  PortInit.PORT_Pin = PORT_Pin_5;
+  PORT_Init(MDR_PORTC, &PortInit);
+//RX
+  PortInit.PORT_FUNC = PORT_FUNC_ALTER;
+  PortInit.PORT_OE = PORT_OE_IN;
+  PortInit.PORT_Pin = PORT_Pin_6;
+  PORT_Init(MDR_PORTC, &PortInit);
+//SCK
+	PortInit.PORT_FUNC = PORT_FUNC_ALTER;
+  PortInit.PORT_OE = PORT_OE_OUT;
+  PortInit.PORT_Pin = PORT_Pin_7;
+  PORT_Init(MDR_PORTC, &PortInit);
 }

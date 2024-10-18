@@ -15,9 +15,9 @@
 ".\objects\mdr32f9qx_eth.o"
 ".\objects\mdr32f9qx_port.o"
 ".\objects\mdr32f9qx_rst_clk.o"
+".\objects\mdr32f9qx_ssp.o"
 ".\objects\mdr32f9qx_timer.o"
 ".\objects\mdr32f9qx_uart.o"
-".\objects\mdr32f9qx_ssp.o"
 --strict --scatter ".\Objects\Ethernet.sct"
 --summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
 --info sizes --info totals --info unused --info veneers
