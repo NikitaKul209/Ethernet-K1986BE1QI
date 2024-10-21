@@ -5,16 +5,20 @@ extern uint8_t DA_MAC_Address[6];
 extern uint8_t SA_MAC_Address[6];
 extern uint8_t SA_IP_Address[4];
 extern uint8_t DA_IP_Address[4];
-uint32_t output_frame [400] __attribute__((section("EXECUTABLE_MEMORY_SECTION"))) ;
-uint32_t input_frame [400] __attribute__((section("EXECUTABLE_MEMORY_SECTION")));
-uint32_t tx_udp_frame[400] __attribute__((section("EXECUTABLE_MEMORY_SECTION")));
+//uint32_t output_frame [400] __attribute__((section("EXECUTABLE_MEMORY_SECTION"))) ;
+//uint32_t input_frame [400] __attribute__((section("EXECUTABLE_MEMORY_SECTION")));
+//uint32_t tx_udp_frame[400] __attribute__((section("EXECUTABLE_MEMORY_SECTION")));
+
+uint32_t output_frame [400]  ;
+uint32_t input_frame [400];
+uint32_t tx_udp_frame[400] ;
 uint16_t adc_data[8000];
 
 bool data_received_flag = false;
 void arp(uint32_t* packet);
 uint16_t calc_crc16(uint16_t* ipv4_header, uint8_t length);
 void get_ethernet_packet(uint32_t* packet);
-//void collect_spi_data(uint16_t*spi_data_buff);
+void collect_spi_data(uint16_t*spi_data_buff);
 void collect_spi_data2(uint16_t*spi_data_buff);
 uint16_t switch_byte(uint16_t val);
 bool  timer_flag = false;
@@ -22,9 +26,9 @@ void ipv_4(uint32_t* packet);
 void icmp(uint32_t* packet);
 void udp(uint32_t* packet);
 
-uint32_t sum_udp_data(uint16_t* header,uint8_t length);
-uint16_t calc_crc16_udp(uint16_t* udp_pseudo_header,uint16_t udp_pseudo_header_length,uint16_t* udp_data, uint16_t udp_data_length);
-
+uint32_t sum_udp_data(uint16_t* header,uint16_t length);
+uint16_t calc_crc16_udp(uint16_t* udp_pseudo_header,uint16_t udp_pseudo_header_length,uint8_t* udp_data, uint16_t udp_data_length);
+bool rx_done_flag;
 
 
 #define ETH_TYPE_ARP     switch_byte(0x0806)
@@ -156,7 +160,7 @@ int main(void)
   set_port();
   set_ethernet();
   set_adc();
-	set_spi();
+  set_spi();
 
 //CONV_LOW
 
@@ -170,12 +174,17 @@ int main(void)
 //for ( int i = 0; i<8000;i++){
 
 //adc_data_p[i] = switch_byte(i);
- collect_spi_data2(adc_data);
+  collect_spi_data2(adc_data);
 //}
   while(1)
 
     {
+//if(rx_done_flag){
+//rx_done_flag = false;
+//	get_ethernet_packet(input_frame);
 
+  collect_spi_data2(adc_data);
+//}
 //      ethernet_PHY_Status();
 //     spi_transfer(MDR_SSP1,0xAA);
       switch(ethernet_states)
@@ -232,6 +241,7 @@ void get_ethernet_packet(uint32_t* packet)
       if ( ethernet_header->ethernet_type == ETH_TYPE_IPV4)
         {
           ethernet_states = IPV4;
+
         }
       else if ( ethernet_header->ethernet_type == ETH_TYPE_ARP )
         {
@@ -353,12 +363,29 @@ void ipv_4(uint32_t* packet)
 
 
 void udp(uint32_t* packet)
+
+
 {
+
   uint8_t* rx_byte_buffer = (uint8_t*)packet;
   ethernet_header_s* rx_ethernet_header = (ethernet_header_s*)rx_byte_buffer;
   ip_header_s* rx_ip_header = (ip_header_s*)(rx_byte_buffer+ETHERNET_HEADER_SIZE);
   udp_header_s* rx_udp_header = (udp_header_s*)(rx_byte_buffer+ETHERNET_HEADER_SIZE+IP_HEADER_SIZE);
 
+//  pseudo_udp_header_s* rx_pseudo_udp_header;
+//  memcpy(rx_pseudo_udp_header->dest_ip,rx_ip_header->target_ip,	IP_ADDR_SIZE) ;
+//  memcpy(rx_pseudo_udp_header->source_ip,rx_ip_header->sender_ip,IP_ADDR_SIZE) ;
+//  rx_pseudo_udp_header->protocol = IP_PROTOCOL_UDP;
+//  rx_pseudo_udp_header->reserved = 0x0;
+//  rx_pseudo_udp_header->udp_header = *rx_udp_header;
+//  rx_pseudo_udp_header->udp_length = rx_udp_header->length;
+
+
+//  uint16_t tmp_crc = switch_byte (rx_udp_header->crc) ;
+//  rx_udp_header->crc = 0x0;
+//	uint16_t calc_udp_crc = calc_crc16_udp((uint16_t*)rx_pseudo_udp_header,UDP_PSEUDO_HEADER_SIZE,(uint16_t*)(uint8_t*) rx_byte_buffer+(ETHERNET_HEADER_SIZE+IP_HEADER_SIZE+UDP_HEADER_SIZE),rx_udp_header->length-UDP_HEADER_SIZE);
+//  if (calc_udp_crc ==tmp_crc)
+//    {
 
   uint8_t* tx_byte_buffer = (uint8_t*)tx_udp_frame+TX_PACKAGE_CONTROL_FIELD;
   ethernet_header_s* tx_ethernet_header =(ethernet_header_s*) tx_byte_buffer;
@@ -392,7 +419,7 @@ void udp(uint32_t* packet)
   memcpy(pseudo_udp_header->source_ip,SA_IP_Address,	IP_ADDR_SIZE);
   pseudo_udp_header->reserved = 0x0;
   pseudo_udp_header->protocol = IP_PROTOCOL_UDP;
-  pseudo_udp_header->udp_length = switch_byte (UDP_HEADER_SIZE+UDP_DATA_SIZE);
+  pseudo_udp_header->udp_length = switch_byte(UDP_HEADER_SIZE+UDP_DATA_SIZE);
   pseudo_udp_header->udp_header = *tx_udp_packet;
 
   //add udp_data
@@ -405,7 +432,7 @@ void udp(uint32_t* packet)
 
       tx_udp_packet->crc = 0;
       memcpy((uint8_t*)tx_udp_frame+(TX_PACKAGE_CONTROL_FIELD+ETHERNET_HEADER_SIZE+IP_HEADER_SIZE+UDP_HEADER_SIZE),(uint8_t*)adc_data_p+(j*1000),UDP_DATA_SIZE);
-      tx_udp_packet->crc = calc_crc16_udp((uint16_t*)pseudo_udp_header,UDP_PSEUDO_HEADER_SIZE,(uint16_t*)tx_byte_buffer+(ETHERNET_HEADER_SIZE+IP_HEADER_SIZE+UDP_HEADER_SIZE)/2, UDP_DATA_SIZE);
+      tx_udp_packet->crc = calc_crc16_udp((uint16_t*)pseudo_udp_header,UDP_PSEUDO_HEADER_SIZE,(tx_byte_buffer+(ETHERNET_HEADER_SIZE+IP_HEADER_SIZE+UDP_HEADER_SIZE)), UDP_DATA_SIZE);
       tx_udp_frame[0]= ETHERNET_HEADER_SIZE+IP_HEADER_SIZE+UDP_HEADER_SIZE+UDP_DATA_SIZE;
       ETH_SendFrame(MDR_ETHERNET1,(uint32_t *)tx_udp_frame,*(uint32_t*)&tx_udp_frame[0]);
       j++;
@@ -419,15 +446,20 @@ void udp(uint32_t* packet)
   PORT_ResetBits(MDR_PORTE,PORT_Pin_7);
   ethernet_states = LISTENING;
 
+
+//    }
+
+
 }
 
-void collect_spi_data2(uint16_t*spi_data_buff){
+void collect_spi_data2(uint16_t*spi_data_buff)
+{
 
 
-  for (int i =0 ; i<8000/2; i++)
+  for (int i =0 ; i<8000; i++)
     {
- spi_data_buff[i] = spi_transfer2(MDR_SSP1,0xAA);
- 
+      spi_data_buff[i] = spi_transfer2(MDR_SSP1,0xAAAA);
+
     }
 
 
@@ -504,7 +536,7 @@ void icmp(uint32_t* packet)
 }
 
 
-uint32_t sum_udp_data(uint16_t* header,uint8_t length)
+uint32_t sum_udp_data(uint16_t* header,uint16_t length)
 {
 
   uint32_t sum = 0;
@@ -512,20 +544,27 @@ uint32_t sum_udp_data(uint16_t* header,uint8_t length)
     {
       sum+=header[i];
     }
+		 if (length%2 !=0)
+    {
+      sum+=*((uint8_t*)header+length-1);
+    }
+  while(sum>>16)
+    {
+      sum = (sum & 0xffff)+(sum>>16);
+    }
+
+
   return sum;
 
 }
 
-uint16_t calc_crc16_udp(uint16_t* udp_pseudo_header,uint16_t udp_pseudo_header_length,uint16_t* udp_data, uint16_t udp_data_length)
+uint16_t calc_crc16_udp(uint16_t* udp_pseudo_header,uint16_t udp_pseudo_header_length,uint8_t* udp_data, uint16_t udp_data_length)
 {
 
   uint32_t sum;
   sum +=sum_udp_data(udp_pseudo_header,udp_pseudo_header_length);
-  sum +=sum_udp_data(udp_data,udp_data_length);
-  if (udp_data_length%2 !=0)
-    {
-      sum+=*((uint8_t*)udp_data+udp_data_length-1);
-    }
+  sum +=sum_udp_data((uint16_t*)udp_data,udp_data_length);
+
   while(sum>>16)
     {
       sum = (sum & 0xffff)+(sum>>16);
@@ -621,6 +660,7 @@ void ETHERNET_IRQHandler(void)
 {
   if(ETH_GetMACITStatus(MDR_ETHERNET1,ETH_MAC_IT_RF_OK))
     {
+//			rx_done_flag = true;
       get_ethernet_packet(input_frame);
     }
 

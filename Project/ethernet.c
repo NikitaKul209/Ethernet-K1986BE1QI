@@ -2,8 +2,9 @@
 #include "main.h"
 
 
-uint8_t DA_MAC_Address[6] = {0x58,0xD5,0x6E,0x3E,0x11,0xC8};
+//uint8_t DA_MAC_Address[6] = {0x58,0xD5,0x6E,0x3E,0x11,0xC8};
 uint8_t SA_MAC_Address[6] = {0x34,0x13,0x78,0x56,0xbc,0x9a};
+//uint8_t SA_MAC_Address[6] = {0x00,0x90,0xE8,0x5D,0x9F,0xC5};
 uint8_t SA_IP_Address[4] = { 169,254,254,172};
 uint8_t DA_IP_Address[4] = { 169,254,254,1};
 
@@ -20,7 +21,7 @@ void set_ethernet(void)
   ETH_InitStruct.ETH_Receive_All_Packets = DISABLE;
   ETH_InitStruct.ETH_Unicast_Frames_Reception = ENABLE;
 
-  ETH_InitStruct.ETH_PHY_Mode = ETH_PHY_MODE_AutoNegotiation;
+  ETH_InitStruct.ETH_PHY_Mode = ETH_PHY_MODE_100BaseT_Full_Duplex;
   ETH_InitStruct.ETH_Transmitter_RST = SET;
   ETH_InitStruct.ETH_Receiver_RST = SET;
   ETH_InitStruct.ETH_Buffer_Mode = ETH_BUFFER_MODE_LINEAR;

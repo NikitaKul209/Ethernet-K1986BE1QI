@@ -3,7 +3,7 @@
 <title>Static Call Graph - [.\Objects\Ethernet.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image .\Objects\Ethernet.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6160001: Last Updated: Fri Oct 18 14:33:01 2024
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6160001: Last Updated: Mon Oct 21 17:39:57 2024
 <BR><P>
 <H3>Maximum Stack Usage =        304 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -1111,7 +1111,7 @@ Global Symbols
 <LI><a href="#[73]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;icmp
 </UL>
 
-<P><STRONG><a name="[6f]"></a>calc_crc16_udp</STRONG> (Thumb, 128 bytes, Stack size 40 bytes, main.o(.text.calc_crc16_udp))
+<P><STRONG><a name="[6f]"></a>calc_crc16_udp</STRONG> (Thumb, 96 bytes, Stack size 40 bytes, main.o(.text.calc_crc16_udp))
 <BR><BR>[Stack]<UL><LI>Max Depth = 56<LI>Call Chain = calc_crc16_udp &rArr; sum_udp_data
 </UL>
 <BR>[Calls]<UL><LI><a href="#[70]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;sum_udp_data
@@ -1157,7 +1157,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[2e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[2e]"></a>main</STRONG> (Thumb, 96 bytes, Stack size 24 bytes, main.o(.text.main))
+<P><STRONG><a name="[2e]"></a>main</STRONG> (Thumb, 104 bytes, Stack size 24 bytes, main.o(.text.main))
 <BR><BR>[Stack]<UL><LI>Max Depth = 304<LI>Call Chain = main &rArr; set_ethernet &rArr; ETH_Init &rArr; ETH_DMAPrepare &rArr; DMA_Init &rArr; DMA_CtrlDataInit
 </UL>
 <BR>[Calls]<UL><LI><a href="#[78]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;set_timer
@@ -1269,7 +1269,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[71]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;collect_spi_data2
 </UL>
 
-<P><STRONG><a name="[70]"></a>sum_udp_data</STRONG> (Thumb, 60 bytes, Stack size 16 bytes, main.o(.text.sum_udp_data))
+<P><STRONG><a name="[70]"></a>sum_udp_data</STRONG> (Thumb, 116 bytes, Stack size 16 bytes, main.o(.text.sum_udp_data))
 <BR><BR>[Stack]<UL><LI>Max Depth = 16<LI>Call Chain = sum_udp_data
 </UL>
 <BR>[Called By]<UL><LI><a href="#[6f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;calc_crc16_udp
