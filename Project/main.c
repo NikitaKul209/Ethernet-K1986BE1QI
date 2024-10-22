@@ -130,7 +130,7 @@ typedef struct
   uint8_t reserved;
   uint8_t protocol;
   uint16_t udp_length;
-  udp_header_s udp_header;
+  udp_header_s *udp_header;
 } pseudo_udp_header_s;
 
 enum
@@ -390,7 +390,7 @@ void udp(uint32_t* packet)
   uint8_t* tx_byte_buffer = (uint8_t*)tx_udp_frame+TX_PACKAGE_CONTROL_FIELD;
   ethernet_header_s* tx_ethernet_header =(ethernet_header_s*) tx_byte_buffer;
   ip_header_s* tx_ip_header = (ip_header_s*)(tx_byte_buffer+ETHERNET_HEADER_SIZE);
-  udp_header_s* tx_udp_packet =(udp_header_s*) (tx_byte_buffer+ETHERNET_HEADER_SIZE+IP_HEADER_SIZE);
+  udp_header_s* tx_udp_header =(udp_header_s*) (tx_byte_buffer+ETHERNET_HEADER_SIZE+IP_HEADER_SIZE);
 
 
   memcpy(tx_ethernet_header->dest_mac, rx_ethernet_header->source_mac,MAC_ADDR_SIZE);
@@ -409,10 +409,10 @@ void udp(uint32_t* packet)
   tx_ip_header->crc = 0x0;
   tx_ip_header->crc = calc_crc16((uint16_t*)tx_ip_header,IP_HEADER_SIZE);
 
-  tx_udp_packet->source_port = switch_byte(UDP_SOURCE_PORT);
-  tx_udp_packet->dest_port = rx_udp_header->source_port;
-  tx_udp_packet->length =switch_byte( UDP_HEADER_SIZE+UDP_DATA_SIZE);
-  tx_udp_packet->crc = 0;
+  tx_udp_header->source_port = switch_byte(UDP_SOURCE_PORT);
+  tx_udp_header->dest_port = rx_udp_header->source_port;
+  tx_udp_header->length = switch_byte( UDP_HEADER_SIZE+UDP_DATA_SIZE);
+  tx_udp_header->crc = 0;
 
   pseudo_udp_header_s* pseudo_udp_header;
   memcpy(pseudo_udp_header->dest_ip,rx_ip_header->sender_ip,	IP_ADDR_SIZE);
@@ -420,7 +420,7 @@ void udp(uint32_t* packet)
   pseudo_udp_header->reserved = 0x0;
   pseudo_udp_header->protocol = IP_PROTOCOL_UDP;
   pseudo_udp_header->udp_length = switch_byte(UDP_HEADER_SIZE+UDP_DATA_SIZE);
-  pseudo_udp_header->udp_header = *tx_udp_packet;
+  pseudo_udp_header->udp_header = tx_udp_header;
 
   //add udp_data
 
@@ -430,9 +430,9 @@ void udp(uint32_t* packet)
   for (int i = 0; i<32; i++)
     {
 
-      tx_udp_packet->crc = 0;
+      tx_udp_header->crc = 0;
       memcpy((uint8_t*)tx_udp_frame+(TX_PACKAGE_CONTROL_FIELD+ETHERNET_HEADER_SIZE+IP_HEADER_SIZE+UDP_HEADER_SIZE),(uint8_t*)adc_data_p+(j*1000),UDP_DATA_SIZE);
-      tx_udp_packet->crc = calc_crc16_udp((uint16_t*)pseudo_udp_header,UDP_PSEUDO_HEADER_SIZE,(tx_byte_buffer+(ETHERNET_HEADER_SIZE+IP_HEADER_SIZE+UDP_HEADER_SIZE)), UDP_DATA_SIZE);
+      tx_udp_header->crc = calc_crc16_udp((uint16_t*)pseudo_udp_header,UDP_PSEUDO_HEADER_SIZE,(tx_byte_buffer+(ETHERNET_HEADER_SIZE+IP_HEADER_SIZE+UDP_HEADER_SIZE)), UDP_DATA_SIZE);
       tx_udp_frame[0]= ETHERNET_HEADER_SIZE+IP_HEADER_SIZE+UDP_HEADER_SIZE+UDP_DATA_SIZE;
       ETH_SendFrame(MDR_ETHERNET1,(uint32_t *)tx_udp_frame,*(uint32_t*)&tx_udp_frame[0]);
       j++;
@@ -561,7 +561,7 @@ uint32_t sum_udp_data(uint16_t* header,uint16_t length)
 uint16_t calc_crc16_udp(uint16_t* udp_pseudo_header,uint16_t udp_pseudo_header_length,uint8_t* udp_data, uint16_t udp_data_length)
 {
 
-  uint32_t sum;
+  uint32_t sum = 0;
   sum +=sum_udp_data(udp_pseudo_header,udp_pseudo_header_length);
   sum +=sum_udp_data((uint16_t*)udp_data,udp_data_length);
 
