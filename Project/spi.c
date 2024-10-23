@@ -31,37 +31,18 @@ void set_spi(void)
   SSP_Cmd(MDR_SSP1, ENABLE);
 }
 
-
-//uint16_t spi_transfer(MDR_SSP_TypeDef *SSPx, uint8_t data)
-//{
-//	CONV_HIGH
-//__NOP();
-//	for (int i = 0; i<3; i++){
-//		__NOP();
-//	}
-//	CONV_LOW
-//  SSP_SendData(SSPx, data);
-//	SSP_SendData(SSPx, data);
-//  while ((SSP_GetFlagStatus(SSPx, SSP_FLAG_RNE) != SET)  ||	(SSP_GetFlagStatus(SSPx, SSP_FLAG_BSY)));
-
-//  return SSP_ReceiveData(SSPx);
-//}
-
-
-uint16_t spi_transfer2(MDR_SSP_TypeDef *SSPx, uint16_t data)
+uint16_t spi_transfer(MDR_SSP_TypeDef *SSPx, uint16_t data)
 {
   uint16_t adc_val;
  
   CONV_HIGH    
-	for (int i = 0; i<8;i++){
+	for (int i = 0; i<5;i++){
 	__NOP();
 	}
-//  __NOP();__NOP();  __NOP();  __NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP()?
   CONV_LOW
   SSP_SendData(SSPx, data);
-
+	 while ((SSP_GetFlagStatus(SSPx, SSP_FLAG_RNE) != SET)  ||	(SSP_GetFlagStatus(SSPx, SSP_FLAG_BSY)));
   adc_val= SSP_ReceiveData(SSPx);
-
   return adc_val;
 }
 
