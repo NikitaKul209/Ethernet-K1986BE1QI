@@ -32,7 +32,7 @@ void set_clk(void)
 	RST_CLK_PCLKcmd(RST_CLK_PCLK_ADC,ENABLE);
 	
 		RST_CLK_PCLKcmd(RST_CLK_PCLK_SSP1, ENABLE);
-	SSP_BRGInit(MDR_SSP1, SSP_HCLKdiv8);
+	SSP_BRGInit(MDR_SSP1, SSP_HCLKdiv2);
 
  
   ETH_ClockDeInit();

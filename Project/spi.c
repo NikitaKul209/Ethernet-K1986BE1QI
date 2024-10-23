@@ -12,7 +12,7 @@ void set_spi(void)
 
   /* Initialize the SSP max speed */
   SPI1.SSP_CPSDVSR = 2;
-  SPI1.SSP_SCR = 1;
+  SPI1.SSP_SCR = 0;
   /* Initialize the SPI_Mode member */
   SPI1.SSP_Mode = SSP_ModeMaster;
   /* initialize the SSP_WordLength member */
@@ -53,12 +53,13 @@ uint16_t spi_transfer2(MDR_SSP_TypeDef *SSPx, uint16_t data)
   uint16_t adc_val;
  
   CONV_HIGH    
-  __NOP();__NOP();  __NOP();  __NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();
+	for (int i = 0; i<8;i++){
+	__NOP();
+	}
+//  __NOP();__NOP();  __NOP();  __NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP();__NOP()?
   CONV_LOW
   SSP_SendData(SSPx, data);
-  while ((SSP_GetFlagStatus(SSPx, SSP_FLAG_RNE) != SET)  ||	(SSP_GetFlagStatus(SSPx, SSP_FLAG_BSY)));
-//  SSP_SendData(SSPx, data);
-//  while ((SSP_GetFlagStatus(SSPx, SSP_FLAG_RNE) != SET)  ||	(SSP_GetFlagStatus(SSPx, SSP_FLAG_BSY)));
+
   adc_val= SSP_ReceiveData(SSPx);
 
   return adc_val;
