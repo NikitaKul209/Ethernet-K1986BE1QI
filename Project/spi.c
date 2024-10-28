@@ -18,7 +18,7 @@ void set_spi(void)
   /* initialize the SSP_WordLength member */
   SPI1.SSP_WordLength = SSP_WordLength16b;
   /* Initialize the SSP_SPH member */
-  SPI1.SSP_SPH = SSP_SPH_1Edge;
+  SPI1.SSP_SPH = SSP_SPH_2Edge;
   /* Initialize the SSP_SPO member */
   SPI1.SSP_SPO = SSP_SPO_Low;
   /* Initialize the SSP_FRF member */
@@ -31,18 +31,30 @@ void set_spi(void)
   SSP_Cmd(MDR_SSP1, ENABLE);
 }
 
-uint16_t spi_transfer(MDR_SSP_TypeDef *SSPx, uint16_t data)
+uint16_t spi_transfer(MDR_SSP_TypeDef *SSPx, uint16_t data,uint16_t counter)
 {
   uint16_t adc_val;
- 
+
   CONV_HIGH    
 	for (int i = 0; i<5;i++){
-	__NOP();
+	__NOP();	__NOP();
 	}
-  CONV_LOW
-  SSP_SendData(SSPx, data);
+ 		  CONV_LOW
+
+
+
+
+//  SSP_SendData(SSPx, data);
+  SSPx->DR = data;
+	
+//	for (int i = 0; i<10;i++){__NOP();}
+// while ((SSP_GetFlagStatus(SSPx, SSP_FLAG_BSY)));
+
 	 while ((SSP_GetFlagStatus(SSPx, SSP_FLAG_RNE) != SET)  ||	(SSP_GetFlagStatus(SSPx, SSP_FLAG_BSY)));
-  adc_val= SSP_ReceiveData(SSPx);
+
+//	 adc_val= SSP_ReceiveData(SSPx);
+adc_val = SSPx->DR;
+
   return adc_val;
 }
 

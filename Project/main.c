@@ -164,7 +164,7 @@ int main(void)
   set_ethernet();
   set_adc();
   set_spi();
-
+spi_transfer(MDR_SSP1,0xAAAA,1);
 //CONV_LOW
 
 
@@ -184,6 +184,7 @@ int main(void)
   while(1)
 
     {
+//			collect_spi_data(adc_data);
       if(rx_done_flag)
         {
           rx_done_flag = false;
@@ -433,19 +434,19 @@ void udp(uint32_t* packet)
 	
   collect_spi_data(adc_data);
   int j =0;
-  for (int i = 0; i<32; i++)
-    {
+//  for (int i = 0; i<1; i++)
+//    {
       tx_udp_header->crc = 0;
-      memcpy((uint8_t*)tx_udp_frame+(TX_PACKAGE_CONTROL_FIELD+ETHERNET_HEADER_SIZE+IP_HEADER_SIZE+UDP_HEADER_SIZE),(uint8_t*)adc_data_p+(j*1000),UDP_DATA_SIZE);
+      memcpy((uint8_t*)tx_udp_frame+(TX_PACKAGE_CONTROL_FIELD+ETHERNET_HEADER_SIZE+IP_HEADER_SIZE+UDP_HEADER_SIZE),(uint8_t*)adc_data_p,UDP_DATA_SIZE);
       tx_udp_header->crc = calc_crc16_udp((uint16_t*)&pseudo_udp_header,UDP_PSEUDO_HEADER_SIZE,(tx_byte_buffer+(ETHERNET_HEADER_SIZE+IP_HEADER_SIZE+UDP_HEADER_SIZE)), UDP_DATA_SIZE);
       tx_udp_frame[0]= ETHERNET_HEADER_SIZE+IP_HEADER_SIZE+UDP_HEADER_SIZE+UDP_DATA_SIZE;
       ETH_SendFrame(MDR_ETHERNET1,(uint32_t *)tx_udp_frame,*(uint32_t*)&tx_udp_frame[0]);
       j++;
-      if( j ==16)
-        {
-          j=0;
-        }
-    }
+//      if( j ==16)
+//        {
+//          j=0;
+//        }
+//    }
   PORT_ResetBits(MDR_PORTE,PORT_Pin_7);
   ethernet_states = LISTENING;
 
@@ -457,11 +458,11 @@ void udp(uint32_t* packet)
 
 void collect_spi_data(uint16_t*spi_data_buff)
 {
-
+//spi_transfer(MDR_SSP1,0xAAAA,1);
 
   for (int i =0 ; i<16; i++)
     {
-      spi_data_buff[i] = ( spi_transfer(MDR_SSP1,0xAAAA));
+      spi_data_buff[i] = ( spi_transfer(MDR_SSP1,0xAAAA,i));
 
     }
 
@@ -635,6 +636,12 @@ void ADC_IRQHandler (void)
   NVIC_ClearPendingIRQ(ADC_IRQn);
 
 }
+
+//void SSP_IRQHandler(void){
+//if (SSP_GetITStatusMasked())
+// SSP_ClearITPendingBit(MDR_SSP_TypeDef* SSPx, SSP_IT_TypeDef SSP_IT)
+//SSP_ITConfig
+//}
 
 void ETHERNET_IRQHandler(void)
 {
