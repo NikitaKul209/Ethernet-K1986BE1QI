@@ -10,4 +10,6 @@ void set_spi(void);
 //uint16_t spi_transfer(MDR_SSP_TypeDef *SSPx, uint16_t data);
 
 uint16_t spi_transfer(MDR_SSP_TypeDef *SSPx, uint16_t data,uint16_t counter);
+uint16_t spi_read_command_reg(void);
+void spi_write_command_reg(void);
 #endif

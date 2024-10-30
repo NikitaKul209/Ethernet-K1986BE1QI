@@ -12,13 +12,13 @@ void set_spi(void)
 
   /* Initialize the SSP max speed */
   SPI1.SSP_CPSDVSR = 2;
-  SPI1.SSP_SCR = 0;
+  SPI1.SSP_SCR = 1;
   /* Initialize the SPI_Mode member */
   SPI1.SSP_Mode = SSP_ModeMaster;
   /* initialize the SSP_WordLength member */
   SPI1.SSP_WordLength = SSP_WordLength16b;
   /* Initialize the SSP_SPH member */
-  SPI1.SSP_SPH = SSP_SPH_2Edge;
+  SPI1.SSP_SPH = SSP_SPH_1Edge;
   /* Initialize the SSP_SPO member */
   SPI1.SSP_SPO = SSP_SPO_Low;
   /* Initialize the SSP_FRF member */
@@ -43,7 +43,6 @@ uint16_t spi_transfer(MDR_SSP_TypeDef *SSPx, uint16_t data,uint16_t counter)
 
 
 
-
 //  SSP_SendData(SSPx, data);
   SSPx->DR = data;
 	
@@ -58,3 +57,27 @@ adc_val = SSPx->DR;
   return adc_val;
 }
 
+void spi_write_command_reg(void){
+	
+CONV_HIGH    
+	for (int i = 0; i<2;i++){
+	__NOP();	__NOP();
+	}
+CONV_LOW
+ MDR_SSP1->DR = 0x14E3;
+SSP_ReceiveData(MDR_SSP1);
+	
+}
+
+uint16_t spi_read_command_reg(void){
+
+CONV_HIGH    
+//	for (int i = 0; i<2;i++){
+//	__NOP();	__NOP();
+//	}
+CONV_LOW
+SSP_SendData(MDR_SSP1, 0x54ff);
+
+
+return  MDR_SSP1->DR;; 
+}

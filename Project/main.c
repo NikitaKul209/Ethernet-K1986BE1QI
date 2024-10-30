@@ -164,7 +164,7 @@ int main(void)
   set_ethernet();
   set_adc();
   set_spi();
-spi_transfer(MDR_SSP1,0xAAAA,1);
+
 //CONV_LOW
 
 
@@ -178,15 +178,29 @@ spi_transfer(MDR_SSP1,0xAAAA,1);
 
 //adc_data_p[i] = switch_byte(i);
 
+		uint16_t command_reg;
+	  for (int i =0 ; i<500; i++)
+    {
+     adc_data[i] =	spi_read_command_reg();
 
-
+    }	
+		
+//		 spi_write_command_reg();
 //}
   while(1)
 
     {
+
+//		spi_read_command_reg();
+
+//		
+//				spi_write_command_reg();
+			
+			
 //			collect_spi_data(adc_data);
       if(rx_done_flag)
         {
+					 
           rx_done_flag = false;
           get_ethernet_packet(input_frame);
 
@@ -432,7 +446,7 @@ void udp(uint32_t* packet)
   pseudo_udp_header.length = switch_byte( UDP_HEADER_SIZE+UDP_DATA_SIZE);
   pseudo_udp_header.crc = 0;
 	
-  collect_spi_data(adc_data);
+//  collect_spi_data(adc_data);
   int j =0;
 //  for (int i = 0; i<1; i++)
 //    {
@@ -460,7 +474,7 @@ void collect_spi_data(uint16_t*spi_data_buff)
 {
 //spi_transfer(MDR_SSP1,0xAAAA,1);
 
-  for (int i =0 ; i<16; i++)
+  for (int i =0 ; i<500; i++)
     {
       spi_data_buff[i] = ( spi_transfer(MDR_SSP1,0xAAAA,i));
 
