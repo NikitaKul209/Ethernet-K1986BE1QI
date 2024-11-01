@@ -48,11 +48,13 @@ void set_port(void)
   PortInit.PORT_Pin = PORT_Pin_15;
   PORT_Init(MDR_PORTE, &PortInit);
 //TX
+PortInit.PORT_PULL_UP = PORT_PULL_UP_ON;
   PortInit.PORT_FUNC = PORT_FUNC_ALTER;
   PortInit.PORT_OE = PORT_OE_OUT;
   PortInit.PORT_Pin = PORT_Pin_5;
   PORT_Init(MDR_PORTC, &PortInit);
 //RX
+PortInit.PORT_PULL_UP = PORT_PULL_UP_OFF;
   PortInit.PORT_FUNC = PORT_FUNC_ALTER;
   PortInit.PORT_OE = PORT_OE_IN;
   PortInit.PORT_Pin = PORT_Pin_6;

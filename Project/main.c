@@ -177,15 +177,17 @@ int main(void)
 //for ( int i = 0; i<8000;i++){
 
 //adc_data_p[i] = switch_byte(i);
+		spi_write_command_reg();
+//		uint16_t command_reg;
+//	  for (int i =0 ; i<500; i++)
+//    {
+//     spi_read_command_reg();
 
-		uint16_t command_reg;
-	  for (int i =0 ; i<500; i++)
-    {
-     adc_data[i] =	spi_read_command_reg();
-
-    }	
+//    }	
 		
 //		 spi_write_command_reg();
+//		 spi_transfer(MDR_SSP1,0xffff,1);
+//			 spi_transfer(MDR_SSP1,0xffff,1);
 //}
   while(1)
 
@@ -446,7 +448,7 @@ void udp(uint32_t* packet)
   pseudo_udp_header.length = switch_byte( UDP_HEADER_SIZE+UDP_DATA_SIZE);
   pseudo_udp_header.crc = 0;
 	
-//  collect_spi_data(adc_data);
+  collect_spi_data(adc_data);
   int j =0;
 //  for (int i = 0; i<1; i++)
 //    {
@@ -472,11 +474,11 @@ void udp(uint32_t* packet)
 
 void collect_spi_data(uint16_t*spi_data_buff)
 {
-//spi_transfer(MDR_SSP1,0xAAAA,1);
+//spi_transfer(MDR_SSP1,0xFFFF,1);
 
   for (int i =0 ; i<500; i++)
     {
-      spi_data_buff[i] = ( spi_transfer(MDR_SSP1,0xAAAA,i));
+      spi_data_buff[i] = ( spi_transfer(MDR_SSP1,0xFFFF,i));
 
     }
 
