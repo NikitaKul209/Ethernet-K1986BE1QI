@@ -5,7 +5,7 @@
 
 #include "main.h"
 
-#define UDP_SOURCE_PORT 8080
+#define UDP_SOURCE_PORT 8070
 
 //extern uint8_t DA_MAC_Address[6] ;
 //extern uint8_t SA_MAC_Address[6] ;

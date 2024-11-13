@@ -24,8 +24,8 @@ void set_spi(void)
   /* Initialize the SSP_FRF member */
   SPI1.SSP_FRF = SSP_FRF_SPI_Motorola;
   /* Initialize the hardware flow control */
-  SPI1.SSP_HardwareFlowControl = SSP_HardwareFlowControl_SSE;
-//  SPI1.SSP_HardwareFlowControl=SSP_HardwareFlowControl_None;
+//  SPI1.SSP_HardwareFlowControl = SSP_HardwareFlowControl_SSE;
+  SPI1.SSP_HardwareFlowControl=SSP_HardwareFlowControl_None;
 	
 //	SSP_ITConfig(MDR_SSP1,SSP_IT_RX,ENABLE);
 //	 NVIC_EnableIRQ(SSP1_IRQn);
@@ -41,7 +41,7 @@ uint16_t spi_transfer(MDR_SSP_TypeDef *SSPx, uint16_t data,uint16_t counter)
 
   CONV_HIGH    
 
-		for (int i = 0; i<3;i++){
+		for (int i = 0; i<6;i++){
 	__NOP();	__NOP();
 	}
 //	__NOP();		__NOP();		__NOP();	__NOP();
@@ -52,9 +52,11 @@ uint16_t spi_transfer(MDR_SSP_TypeDef *SSPx, uint16_t data,uint16_t counter)
 
 //  SSP_SendData(SSPx, data);
   SSPx->DR = data;
-			for (int i = 0; i<8;i++){
+
+			for (int i = 0; i<6;i++){
 	__NOP();	__NOP();
 	}
+//			PORT_SetBits(MDR_PORTE,PORT_Pin_7);
 //	for (int i = 0; i<8;i++){__NOP();}
 // while ((SSP_GetFlagStatus(SSPx, SSP_FLAG_BSY)));
 //while ( (SSPx->SR & ((uint32_t)SSP_FLAG_BSY)) );

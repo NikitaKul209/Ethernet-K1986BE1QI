@@ -135,7 +135,7 @@ typedef struct
   uint16_t crc;
 
 } pseudo_udp_header_s;
-pseudo_udp_header_s pseudo_udp_header;
+pseudo_udp_header_s pseudo_udp_head;
 enum
 {
   LISTENING,
@@ -165,7 +165,7 @@ int main(void)
   set_adc();
   set_spi();
 
-//CONV_LOW
+
 
 
   ethernet_states = LISTENING;
@@ -177,14 +177,14 @@ int main(void)
 //for ( int i = 0; i<8000;i++){
 
 //adc_data_p[i] = switch_byte(i);
-		spi_write_command_reg();
+//  spi_write_command_reg();
 //		uint16_t command_reg;
 //	  for (int i =0 ; i<500; i++)
 //    {
 //     spi_read_command_reg();
 
-//    }	
-		
+//    }
+
 //		 spi_write_command_reg();
 //		 spi_transfer(MDR_SSP1,0xffff,1);
 //			 spi_transfer(MDR_SSP1,0xffff,1);
@@ -195,14 +195,14 @@ int main(void)
 
 //		spi_read_command_reg();
 
-//		
+//
 //				spi_write_command_reg();
-			
-			
+
+
 //			collect_spi_data(adc_data);
       if(rx_done_flag)
         {
-					 
+
           rx_done_flag = false;
           get_ethernet_packet(input_frame);
 
@@ -222,19 +222,6 @@ int main(void)
           break;
 
         }
-
-
-//      if(timer_flag)
-//        {
-
-//          val = ~val;
-//          PORT_ResetBits(MDR_PORTC,PORT_Pin_9);
-//          PORT_WriteBit(MDR_PORTA, PORT_Pin_9,val);
-//          timer_flag = false;
-
-////          ARP_REQUEST();
-//          TIMER_Cmd(MDR_TIMER2, ENABLE);
-//        }
 
     }
 
@@ -277,53 +264,96 @@ void get_ethernet_packet(uint32_t* packet)
     }
 }
 
-void make_ethernet_header(uint32_t* rx_packet,uint32_t* tx_packet)
+void make_ethernet_header(ethernet_header_s* tx_ethernet_header,ethernet_header_s* rx_ethernet_header,uint16_t ETH_TYPE)
 {
 
-  ethernet_header_s* tx_ethernet_header =(ethernet_header_s*) tx_packet;
-  ethernet_header_s* rx_ethernet_header =(ethernet_header_s*) rx_packet;
   memcpy(tx_ethernet_header->dest_mac, rx_ethernet_header->source_mac,6);
   memcpy(tx_ethernet_header->source_mac,SA_MAC_Address,6);
-  tx_ethernet_header->ethernet_type = ETH_TYPE_ARP;
+  tx_ethernet_header->ethernet_type = ETH_TYPE;
 
 }
 
+
+void make_arp_header(arp_packet_s* tx_arp_packet, arp_packet_s* rx_arp_packet)
+{
+
+  tx_arp_packet->hw_type = ARP_HTYPE_ETH;
+  tx_arp_packet->pr_type = ARP_PTYPE;
+  tx_arp_packet->hw_length =ARP_HLEN;
+  tx_arp_packet->pr_length =ARP_PLEN;
+  tx_arp_packet->operation = ARP_REP;
+  memcpy(tx_arp_packet->sender_mac, SA_MAC_Address,6);
+  memcpy(tx_arp_packet->sender_ip,SA_IP_Address,6);
+  memcpy(tx_arp_packet->target_mac,rx_arp_packet->sender_mac,6);
+  memcpy(tx_arp_packet->target_ip,rx_arp_packet->sender_ip,6);
+}
+
+
+
+void make_ip_header(  ip_header_s* tx_ip_header,  ip_header_s* rx_ip_header,uint16_t ip_length,uint16_t ip_protocol)
+{
+
+
+  tx_ip_header->version_ihl = 0x45;
+  tx_ip_header->type_of_service = rx_ip_header->type_of_service;
+  tx_ip_header->total_length = switch_byte(ip_length);
+  tx_ip_header->identification = rx_ip_header->identification;
+  tx_ip_header->flags_and_fragment_offset = rx_ip_header->flags_and_fragment_offset;
+  tx_ip_header->time_to_live = IP_TTL;
+  tx_ip_header->high_level_protocol = ip_protocol;
+  memcpy(tx_ip_header->sender_ip,SA_IP_Address,	IP_ADDR_SIZE);
+  memcpy(tx_ip_header->target_ip,rx_ip_header->sender_ip,	IP_ADDR_SIZE);
+  tx_ip_header->crc = 0x0;
+  tx_ip_header->crc = calc_crc16((uint16_t*)tx_ip_header,IP_HEADER_SIZE);
+
+
+}
+
+void make_udp_header( udp_header_s* tx_udp_header, udp_header_s* rx_udp_header, uint8_t* dest_ip)
+{
+
+  tx_udp_header->source_port = switch_byte(UDP_SOURCE_PORT);
+  tx_udp_header->dest_port = rx_udp_header->source_port;
+  tx_udp_header->length = switch_byte( UDP_HEADER_SIZE+UDP_DATA_SIZE);
+  tx_udp_header->crc = 0;
+
+  pseudo_udp_header_s* pseudo_udp_header = &pseudo_udp_head ;
+
+  memcpy(pseudo_udp_header->dest_ip,dest_ip,	IP_ADDR_SIZE);
+  memcpy(pseudo_udp_header->source_ip,SA_IP_Address,	IP_ADDR_SIZE);
+  pseudo_udp_header->reserved = 0x0;
+  pseudo_udp_header->protocol = IP_PROTOCOL_UDP;
+  pseudo_udp_header->udp_length = switch_byte(UDP_HEADER_SIZE+UDP_DATA_SIZE);
+  pseudo_udp_header->source_port = switch_byte(UDP_SOURCE_PORT);
+  pseudo_udp_header->dest_port =(rx_udp_header->source_port);
+  pseudo_udp_header->length = switch_byte( UDP_HEADER_SIZE+UDP_DATA_SIZE);
+  pseudo_udp_header->crc = 0;
+
+
+}
 void arp(uint32_t* packet)
 {
 
   uint8_t* rx_byte_buffer = (uint8_t*)packet;
   ethernet_header_s* rx_ethernet_header = (ethernet_header_s*)rx_byte_buffer;
-  arp_packet_s* rx_arp_packet = (arp_packet_s*)(rx_byte_buffer + ETHERNET_HEADER_SIZE);
+  arp_packet_s* rx_arp_header = (arp_packet_s*)(rx_byte_buffer + ETHERNET_HEADER_SIZE);
+
+  uint8_t* tx_byte_buffer = (uint8_t*)output_frame+TX_PACKAGE_CONTROL_FIELD;
+  ethernet_header_s* tx_ethernet_header =(ethernet_header_s*) tx_byte_buffer;
+  arp_packet_s* tx_arp_header =(arp_packet_s*) (tx_byte_buffer+ETHERNET_HEADER_SIZE);
 
 
-  if (memcmp(rx_arp_packet->target_ip, SA_IP_Address, IP_ADDR_SIZE) == 0)
+  if (memcmp(rx_arp_header->target_ip, SA_IP_Address, IP_ADDR_SIZE) == 0)
     {
 
-      if (((rx_arp_packet->operation)) == ARP_REQ)
+      if (((rx_arp_header->operation)) == ARP_REQ)
         {
 
-
-          uint8_t* tx_byte_buffer = (uint8_t*)output_frame+TX_PACKAGE_CONTROL_FIELD;
-          ethernet_header_s* tx_ethernet_header =(ethernet_header_s*) tx_byte_buffer;
-          arp_packet_s* tx_arp_packet =(arp_packet_s*) (tx_byte_buffer+ETHERNET_HEADER_SIZE);
-
-          memcpy(tx_ethernet_header->dest_mac, rx_arp_packet->sender_mac,6);
-          memcpy(tx_ethernet_header->source_mac,SA_MAC_Address,6);
-          tx_ethernet_header->ethernet_type = ETH_TYPE_ARP;
-
-          tx_arp_packet->hw_type = ARP_HTYPE_ETH;
-          tx_arp_packet->pr_type = ARP_PTYPE;
-          tx_arp_packet->hw_length =ARP_HLEN;
-          tx_arp_packet->pr_length =ARP_PLEN;
-          tx_arp_packet->operation = ARP_REP;
-          memcpy(tx_arp_packet->sender_mac, SA_MAC_Address,6);
-          memcpy(tx_arp_packet->sender_ip,SA_IP_Address,6);
-          memcpy(tx_arp_packet->target_mac,rx_arp_packet->sender_mac,6);
-          memcpy(tx_arp_packet->target_ip,rx_arp_packet->sender_ip,6);
+          make_ethernet_header(tx_ethernet_header,rx_ethernet_header,ETH_TYPE_ARP);
+          make_arp_header(tx_arp_header,rx_arp_header);
 
           output_frame[0]= 42;
           ETH_SendFrame(MDR_ETHERNET1,(uint32_t *)output_frame,*(uint32_t*)&output_frame[0]);
-
         }
     }
 
@@ -387,83 +417,39 @@ void ipv_4(uint32_t* packet)
 
 void udp(uint32_t* packet)
 
-
 {
-  PORT_SetBits(MDR_PORTE,PORT_Pin_7);
+//  PORT_SetBits(MDR_PORTE,PORT_Pin_7);
+
   uint8_t* rx_byte_buffer = (uint8_t*)packet;
   ethernet_header_s* rx_ethernet_header = (ethernet_header_s*)rx_byte_buffer;
   ip_header_s* rx_ip_header = (ip_header_s*)(rx_byte_buffer+ETHERNET_HEADER_SIZE);
   udp_header_s* rx_udp_header = (udp_header_s*)(rx_byte_buffer+ETHERNET_HEADER_SIZE+IP_HEADER_SIZE);
-
-//  pseudo_udp_header_s* rx_pseudo_udp_header;
-//  memcpy(rx_pseudo_udp_header->dest_ip,rx_ip_header->target_ip,	IP_ADDR_SIZE) ;
-//  memcpy(rx_pseudo_udp_header->source_ip,rx_ip_header->sender_ip,IP_ADDR_SIZE) ;
-//  rx_pseudo_udp_header->protocol = IP_PROTOCOL_UDP;
-//  rx_pseudo_udp_header->reserved = 0x0;
-//  rx_pseudo_udp_header->udp_header = *rx_udp_header;
-//  rx_pseudo_udp_header->udp_length = rx_udp_header->length;
-
-
-//  uint16_t tmp_crc = switch_byte (rx_udp_header->crc) ;
-//  rx_udp_header->crc = 0x0;
-//	uint16_t calc_udp_crc = calc_crc16_udp((uint16_t*)rx_pseudo_udp_header,UDP_PSEUDO_HEADER_SIZE,(uint16_t*)(uint8_t*) rx_byte_buffer+(ETHERNET_HEADER_SIZE+IP_HEADER_SIZE+UDP_HEADER_SIZE),rx_udp_header->length-UDP_HEADER_SIZE);
-//  if (calc_udp_crc ==tmp_crc)
-//    {
 
   uint8_t* tx_byte_buffer = (uint8_t*)tx_udp_frame+TX_PACKAGE_CONTROL_FIELD;
   ethernet_header_s* tx_ethernet_header =(ethernet_header_s*) tx_byte_buffer;
   ip_header_s* tx_ip_header = (ip_header_s*)(tx_byte_buffer+ETHERNET_HEADER_SIZE);
   udp_header_s* tx_udp_header =(udp_header_s*) (tx_byte_buffer+ETHERNET_HEADER_SIZE+IP_HEADER_SIZE);
 
+  make_ethernet_header(tx_ethernet_header,rx_ethernet_header,ETH_TYPE_IPV4);
+  make_ip_header(tx_ip_header,rx_ip_header,IP_HEADER_SIZE+UDP_HEADER_SIZE+UDP_DATA_SIZE,IP_PROTOCOL_UDP);
+  make_udp_header(tx_udp_header,rx_udp_header,rx_ip_header->sender_ip);
 
-  memcpy(tx_ethernet_header->dest_mac, rx_ethernet_header->source_mac,MAC_ADDR_SIZE);
-  memcpy(tx_ethernet_header->source_mac,SA_MAC_Address,6);
-  tx_ethernet_header->ethernet_type = ETH_TYPE_IPV4;
-
-  tx_ip_header->version_ihl = 0x45;
-  tx_ip_header->type_of_service = rx_ip_header->type_of_service;
-  tx_ip_header->total_length = switch_byte(IP_HEADER_SIZE+UDP_HEADER_SIZE+UDP_DATA_SIZE);
-  tx_ip_header->identification = rx_ip_header->identification;
-  tx_ip_header->flags_and_fragment_offset = rx_ip_header->flags_and_fragment_offset;
-  tx_ip_header->time_to_live = IP_TTL;
-  tx_ip_header->high_level_protocol = IP_PROTOCOL_UDP;
-  memcpy(tx_ip_header->sender_ip,SA_IP_Address,	IP_ADDR_SIZE);
-  memcpy(tx_ip_header->target_ip,rx_ip_header->sender_ip,	IP_ADDR_SIZE);
-  tx_ip_header->crc = 0x0;
-  tx_ip_header->crc = calc_crc16((uint16_t*)tx_ip_header,IP_HEADER_SIZE);
-
-  tx_udp_header->source_port = switch_byte(UDP_SOURCE_PORT);
-  tx_udp_header->dest_port = rx_udp_header->source_port;
-  tx_udp_header->length = switch_byte( UDP_HEADER_SIZE+UDP_DATA_SIZE);
-  tx_udp_header->crc = 0;
-
-
-  memcpy(pseudo_udp_header.dest_ip,rx_ip_header->sender_ip,	IP_ADDR_SIZE);
-  memcpy(pseudo_udp_header.source_ip,SA_IP_Address,	IP_ADDR_SIZE);
-  pseudo_udp_header.reserved = 0x0;
-  pseudo_udp_header.protocol = IP_PROTOCOL_UDP;
-  pseudo_udp_header.udp_length = switch_byte(UDP_HEADER_SIZE+UDP_DATA_SIZE);
-  pseudo_udp_header.source_port = switch_byte(UDP_SOURCE_PORT);
-  pseudo_udp_header.dest_port =(rx_udp_header->source_port);
-  pseudo_udp_header.length = switch_byte( UDP_HEADER_SIZE+UDP_DATA_SIZE);
-  pseudo_udp_header.crc = 0;
-	
   collect_spi_data(adc_data);
   int j =0;
 //  for (int i = 0; i<1; i++)
 //    {
-      tx_udp_header->crc = 0;
-      memcpy((uint8_t*)tx_udp_frame+(TX_PACKAGE_CONTROL_FIELD+ETHERNET_HEADER_SIZE+IP_HEADER_SIZE+UDP_HEADER_SIZE),(uint8_t*)adc_data_p,UDP_DATA_SIZE);
-      tx_udp_header->crc = calc_crc16_udp((uint16_t*)&pseudo_udp_header,UDP_PSEUDO_HEADER_SIZE,(tx_byte_buffer+(ETHERNET_HEADER_SIZE+IP_HEADER_SIZE+UDP_HEADER_SIZE)), UDP_DATA_SIZE);
-      tx_udp_frame[0]= ETHERNET_HEADER_SIZE+IP_HEADER_SIZE+UDP_HEADER_SIZE+UDP_DATA_SIZE;
-      ETH_SendFrame(MDR_ETHERNET1,(uint32_t *)tx_udp_frame,*(uint32_t*)&tx_udp_frame[0]);
-      j++;
+  tx_udp_header->crc = 0;
+  memcpy((uint8_t*)tx_udp_frame+(TX_PACKAGE_CONTROL_FIELD+ETHERNET_HEADER_SIZE+IP_HEADER_SIZE+UDP_HEADER_SIZE),(uint8_t*)adc_data_p,UDP_DATA_SIZE);
+  tx_udp_header->crc = calc_crc16_udp((uint16_t*)&pseudo_udp_head,UDP_PSEUDO_HEADER_SIZE,(tx_byte_buffer+(ETHERNET_HEADER_SIZE+IP_HEADER_SIZE+UDP_HEADER_SIZE)), UDP_DATA_SIZE);
+  tx_udp_frame[0]= ETHERNET_HEADER_SIZE+IP_HEADER_SIZE+UDP_HEADER_SIZE+UDP_DATA_SIZE;
+  ETH_SendFrame(MDR_ETHERNET1,(uint32_t *)tx_udp_frame,*(uint32_t*)&tx_udp_frame[0]);
+  j++;
 //      if( j ==16)
 //        {
 //          j=0;
 //        }
 //    }
-  PORT_ResetBits(MDR_PORTE,PORT_Pin_7);
+//  PORT_ResetBits(MDR_PORTE,PORT_Pin_7);
   ethernet_states = LISTENING;
 
 
@@ -485,7 +471,19 @@ void collect_spi_data(uint16_t*spi_data_buff)
 
 }
 
+void make_icmp_header(icmp_header_s* tx_icmp_header,icmp_header_s* rx_icmp_header,uint8_t* tx_byte_buffer,uint8_t* rx_byte_buffer  )
+{
 
+
+  tx_icmp_header->code = 0x0;
+  tx_icmp_header->type = 0x0;
+  tx_icmp_header->identifier = rx_icmp_header->identifier;
+  tx_icmp_header->sequence = rx_icmp_header->sequence;
+  memcpy(tx_byte_buffer+ETHERNET_HEADER_SIZE+IP_HEADER_SIZE+ICMP_HEADER_SIZE,rx_byte_buffer+ETHERNET_HEADER_SIZE+IP_HEADER_SIZE+ICMP_HEADER_SIZE,32);
+  tx_icmp_header->crc = 0;
+  tx_icmp_header->crc = calc_crc16((uint16_t*)tx_icmp_header,ICMP_HEADER_SIZE+32);
+
+}
 void icmp(uint32_t* packet)
 {
 
@@ -493,38 +491,19 @@ void icmp(uint32_t* packet)
   uint8_t* rx_byte_buffer = (uint8_t*)packet;
   ethernet_header_s* rx_ethernet_header = (ethernet_header_s*)rx_byte_buffer;
   ip_header_s* rx_ip_header = (ip_header_s*)(rx_byte_buffer+ETHERNET_HEADER_SIZE);
-  icmp_header_s* rec_icmp_header = (icmp_header_s*)(rx_byte_buffer+ETHERNET_HEADER_SIZE+IP_HEADER_SIZE);
+  icmp_header_s* rx_icmp_header = (icmp_header_s*)(rx_byte_buffer+ETHERNET_HEADER_SIZE+IP_HEADER_SIZE);
 
   uint8_t* tx_byte_buffer = (uint8_t*)output_frame+TX_PACKAGE_CONTROL_FIELD;
   ethernet_header_s* tx_ethernet_header =(ethernet_header_s*) tx_byte_buffer;
   ip_header_s* tx_ip_header = (ip_header_s*)(tx_byte_buffer+ETHERNET_HEADER_SIZE);
-  icmp_header_s* tx_icmp_packet =(icmp_header_s*) (tx_byte_buffer+ETHERNET_HEADER_SIZE+IP_HEADER_SIZE);
+  icmp_header_s* tx_icmp_header =(icmp_header_s*) (tx_byte_buffer+ETHERNET_HEADER_SIZE+IP_HEADER_SIZE);
 
 
-  memcpy(tx_ethernet_header->dest_mac, rx_ethernet_header->source_mac,MAC_ADDR_SIZE);
-  memcpy(tx_ethernet_header->source_mac,SA_MAC_Address,MAC_ADDR_SIZE);
-  tx_ethernet_header->ethernet_type = ETH_TYPE_IPV4;
-
-  tx_ip_header->version_ihl = 0x45;
-  tx_ip_header->type_of_service = rx_ip_header->type_of_service;
-  tx_ip_header->total_length = switch_byte(IP_HEADER_SIZE+ICMP_HEADER_SIZE+32);
-  tx_ip_header->identification = rx_ip_header->identification;
-  tx_ip_header->flags_and_fragment_offset = rx_ip_header->flags_and_fragment_offset;
-  tx_ip_header->time_to_live = IP_TTL;
-  tx_ip_header->high_level_protocol = IP_PROTOCOL_ICMP;
-  memcpy(tx_ip_header->sender_ip,SA_IP_Address,	IP_ADDR_SIZE);
-  memcpy(tx_ip_header->target_ip,rx_ip_header->sender_ip,	IP_ADDR_SIZE);
-  tx_ip_header->crc = 0x0;
-  tx_ip_header->crc = calc_crc16((uint16_t*)tx_ip_header,IP_HEADER_SIZE);
+  make_ethernet_header(tx_ethernet_header,rx_ethernet_header,ETH_TYPE_IPV4);
+  make_ip_header(tx_ip_header,rx_ip_header,IP_HEADER_SIZE+ICMP_HEADER_SIZE+32,IP_PROTOCOL_ICMP);
+  make_icmp_header(tx_icmp_header,rx_icmp_header,tx_byte_buffer,rx_byte_buffer);
 
 
-  tx_icmp_packet->code = 0x0;
-  tx_icmp_packet->type = 0x0;
-  tx_icmp_packet->identifier = rec_icmp_header->identifier;
-  tx_icmp_packet->sequence = rec_icmp_header->sequence;
-  memcpy(tx_byte_buffer+ETHERNET_HEADER_SIZE+IP_HEADER_SIZE+ICMP_HEADER_SIZE,rx_byte_buffer+ETHERNET_HEADER_SIZE+IP_HEADER_SIZE+ICMP_HEADER_SIZE,32);
-  tx_icmp_packet->crc = 0;
-  tx_icmp_packet->crc = calc_crc16((uint16_t*)tx_icmp_packet,ICMP_HEADER_SIZE+32);
 
   output_frame[0]= ETHERNET_HEADER_SIZE+IP_HEADER_SIZE+ICMP_HEADER_SIZE+32;
   ETH_SendFrame(MDR_ETHERNET1,(uint32_t *)output_frame,*(uint32_t*)&output_frame[0]);

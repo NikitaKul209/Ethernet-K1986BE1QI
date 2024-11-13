@@ -1,6 +1,6 @@
 Dependencies for Project 'Ethernet', Target 'Target 1': (DO NOT MODIFY !)
 CompilerVersion: 6160000::V6.16::ARMCLANG
-F (.\main.c)(0x6724C95D)(-xc -std=gnu11 --target=arm-arm-none-eabi -mcpu=cortex-m1 -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -gdwarf-4 -O1 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I./RTE/Device/MDR1986BE1T-I./RTE/_Target_1-IC:/Users/nkulikov/AppData/Local/Arm/Packs/Keil/MDR1986BExx/2.0.3/Libraries/CMSIS/MDR32Fx/CoreSupport/CM1-IC:/Users/nkulikov/AppData/Local/Arm/Packs/Keil/MDR1986BExx/2.0.3/Libraries/CMSIS/MDR32Fx/DeviceSupport/MDR1986VE1T/inc-IC:/Users/nkulikov/AppData/Local/Arm/Packs/Keil/MDR1986BExx/2.0.3/Libraries/SPL/MDR32Fx/inc-D__UVISION_VERSION="536" -D_RTE_ -D_RTE_-o ./objects/main.o -MD)
+F (.\main.c)(0x673499AF)(-xc -std=gnu11 --target=arm-arm-none-eabi -mcpu=cortex-m1 -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -gdwarf-4 -O1 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I./RTE/Device/MDR1986BE1T-I./RTE/_Target_1-IC:/Users/nkulikov/AppData/Local/Arm/Packs/Keil/MDR1986BExx/2.0.3/Libraries/CMSIS/MDR32Fx/CoreSupport/CM1-IC:/Users/nkulikov/AppData/Local/Arm/Packs/Keil/MDR1986BExx/2.0.3/Libraries/CMSIS/MDR32Fx/DeviceSupport/MDR1986VE1T/inc-IC:/Users/nkulikov/AppData/Local/Arm/Packs/Keil/MDR1986BExx/2.0.3/Libraries/SPL/MDR32Fx/inc-D__UVISION_VERSION="536" -D_RTE_ -D_RTE_-o ./objects/main.o -MD)
 I (main.h)(0x670FB2C7)
 I (C:\Program Files\Keil_v5\ARM\ARMCLANG\include\stdbool.h)(0x60354E1A)
 I (C:\Program Files\Keil_v5\ARM\ARMCLANG\include\stdlib.h)(0x60354E20)
@@ -24,11 +24,11 @@ I (C:\Users\nkulikov\AppData\Local\Arm\Packs\Keil\MDR1986BExx\2.0.3\Libraries\SP
 I (C:\Users\nkulikov\AppData\Local\Arm\Packs\Keil\MDR1986BExx\2.0.3\Libraries\SPL\MDR32Fx\inc\MDR32F9Qx_adc.h)(0x6114C5F2)
 I (port.h)(0x66976C5A)
 I (clk.h)(0x66976C5A)
-I (ethernet.h)(0x6716012D)
+I (ethernet.h)(0x67344B24)
 I (tmr.h)(0x66A34AE7)
 I (adc.h)(0x66D00799)
 I (spi.h)(0x67248568)
-F (.\port.c)(0x67248F80)(-xc -std=gnu11 --target=arm-arm-none-eabi -mcpu=cortex-m1 -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -gdwarf-4 -O1 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I./RTE/Device/MDR1986BE1T-I./RTE/_Target_1-IC:/Users/nkulikov/AppData/Local/Arm/Packs/Keil/MDR1986BExx/2.0.3/Libraries/CMSIS/MDR32Fx/CoreSupport/CM1-IC:/Users/nkulikov/AppData/Local/Arm/Packs/Keil/MDR1986BExx/2.0.3/Libraries/CMSIS/MDR32Fx/DeviceSupport/MDR1986VE1T/inc-IC:/Users/nkulikov/AppData/Local/Arm/Packs/Keil/MDR1986BExx/2.0.3/Libraries/SPL/MDR32Fx/inc-D__UVISION_VERSION="536" -D_RTE_ -D_RTE_-o ./objects/port.o -MD)
+F (.\port.c)(0x673499AF)(-xc -std=gnu11 --target=arm-arm-none-eabi -mcpu=cortex-m1 -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -gdwarf-4 -O1 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I./RTE/Device/MDR1986BE1T-I./RTE/_Target_1-IC:/Users/nkulikov/AppData/Local/Arm/Packs/Keil/MDR1986BExx/2.0.3/Libraries/CMSIS/MDR32Fx/CoreSupport/CM1-IC:/Users/nkulikov/AppData/Local/Arm/Packs/Keil/MDR1986BExx/2.0.3/Libraries/CMSIS/MDR32Fx/DeviceSupport/MDR1986VE1T/inc-IC:/Users/nkulikov/AppData/Local/Arm/Packs/Keil/MDR1986BExx/2.0.3/Libraries/SPL/MDR32Fx/inc-D__UVISION_VERSION="536" -D_RTE_ -D_RTE_-o ./objects/port.o -MD)
 I (port.h)(0x66976C5A)
 I (main.h)(0x670FB2C7)
 I (C:\Program Files\Keil_v5\ARM\ARMCLANG\include\stdbool.h)(0x60354E1A)
@@ -52,13 +52,13 @@ I (C:\Users\nkulikov\AppData\Local\Arm\Packs\Keil\MDR1986BExx\2.0.3\Libraries\SP
 I (C:\Users\nkulikov\AppData\Local\Arm\Packs\Keil\MDR1986BExx\2.0.3\Libraries\SPL\MDR32Fx\inc\MDR32F9Qx_eth.h)(0x6114C5F2)
 I (C:\Users\nkulikov\AppData\Local\Arm\Packs\Keil\MDR1986BExx\2.0.3\Libraries\SPL\MDR32Fx\inc\MDR32F9Qx_adc.h)(0x6114C5F2)
 I (clk.h)(0x66976C5A)
-I (ethernet.h)(0x6716012D)
+I (ethernet.h)(0x67344B24)
 I (tmr.h)(0x66A34AE7)
 I (adc.h)(0x66D00799)
 I (spi.h)(0x67248568)
 F (.\port.h)(0x66976C5A)()
 F (.\main.h)(0x670FB2C7)()
-F (.\clk.c)(0x67248B60)(-xc -std=gnu11 --target=arm-arm-none-eabi -mcpu=cortex-m1 -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -gdwarf-4 -O1 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I./RTE/Device/MDR1986BE1T-I./RTE/_Target_1-IC:/Users/nkulikov/AppData/Local/Arm/Packs/Keil/MDR1986BExx/2.0.3/Libraries/CMSIS/MDR32Fx/CoreSupport/CM1-IC:/Users/nkulikov/AppData/Local/Arm/Packs/Keil/MDR1986BExx/2.0.3/Libraries/CMSIS/MDR32Fx/DeviceSupport/MDR1986VE1T/inc-IC:/Users/nkulikov/AppData/Local/Arm/Packs/Keil/MDR1986BExx/2.0.3/Libraries/SPL/MDR32Fx/inc-D__UVISION_VERSION="536" -D_RTE_ -D_RTE_-o ./objects/clk.o -MD)
+F (.\clk.c)(0x67348362)(-xc -std=gnu11 --target=arm-arm-none-eabi -mcpu=cortex-m1 -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -gdwarf-4 -O1 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I./RTE/Device/MDR1986BE1T-I./RTE/_Target_1-IC:/Users/nkulikov/AppData/Local/Arm/Packs/Keil/MDR1986BExx/2.0.3/Libraries/CMSIS/MDR32Fx/CoreSupport/CM1-IC:/Users/nkulikov/AppData/Local/Arm/Packs/Keil/MDR1986BExx/2.0.3/Libraries/CMSIS/MDR32Fx/DeviceSupport/MDR1986VE1T/inc-IC:/Users/nkulikov/AppData/Local/Arm/Packs/Keil/MDR1986BExx/2.0.3/Libraries/SPL/MDR32Fx/inc-D__UVISION_VERSION="536" -D_RTE_ -D_RTE_-o ./objects/clk.o -MD)
 I (clk.h)(0x66976C5A)
 I (main.h)(0x670FB2C7)
 I (C:\Program Files\Keil_v5\ARM\ARMCLANG\include\stdbool.h)(0x60354E1A)
@@ -82,13 +82,13 @@ I (C:\Users\nkulikov\AppData\Local\Arm\Packs\Keil\MDR1986BExx\2.0.3\Libraries\SP
 I (C:\Users\nkulikov\AppData\Local\Arm\Packs\Keil\MDR1986BExx\2.0.3\Libraries\SPL\MDR32Fx\inc\MDR32F9Qx_eth.h)(0x6114C5F2)
 I (C:\Users\nkulikov\AppData\Local\Arm\Packs\Keil\MDR1986BExx\2.0.3\Libraries\SPL\MDR32Fx\inc\MDR32F9Qx_adc.h)(0x6114C5F2)
 I (port.h)(0x66976C5A)
-I (ethernet.h)(0x6716012D)
+I (ethernet.h)(0x67344B24)
 I (tmr.h)(0x66A34AE7)
 I (adc.h)(0x66D00799)
 I (spi.h)(0x67248568)
 F (.\clk.h)(0x66976C5A)()
 F (.\ethernet.c)(0x671650B2)(-xc -std=gnu11 --target=arm-arm-none-eabi -mcpu=cortex-m1 -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -gdwarf-4 -O1 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I./RTE/Device/MDR1986BE1T-I./RTE/_Target_1-IC:/Users/nkulikov/AppData/Local/Arm/Packs/Keil/MDR1986BExx/2.0.3/Libraries/CMSIS/MDR32Fx/CoreSupport/CM1-IC:/Users/nkulikov/AppData/Local/Arm/Packs/Keil/MDR1986BExx/2.0.3/Libraries/CMSIS/MDR32Fx/DeviceSupport/MDR1986VE1T/inc-IC:/Users/nkulikov/AppData/Local/Arm/Packs/Keil/MDR1986BExx/2.0.3/Libraries/SPL/MDR32Fx/inc-D__UVISION_VERSION="536" -D_RTE_ -D_RTE_-o ./objects/ethernet.o -MD)
-I (ethernet.h)(0x6716012D)
+I (ethernet.h)(0x67344B24)
 I (main.h)(0x670FB2C7)
 I (C:\Program Files\Keil_v5\ARM\ARMCLANG\include\stdbool.h)(0x60354E1A)
 I (C:\Program Files\Keil_v5\ARM\ARMCLANG\include\stdlib.h)(0x60354E20)
@@ -115,7 +115,7 @@ I (clk.h)(0x66976C5A)
 I (tmr.h)(0x66A34AE7)
 I (adc.h)(0x66D00799)
 I (spi.h)(0x67248568)
-F (.\ethernet.h)(0x6716012D)()
+F (.\ethernet.h)(0x67344B24)()
 F (.\tmr.c)(0x670392C6)(-xc -std=gnu11 --target=arm-arm-none-eabi -mcpu=cortex-m1 -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -gdwarf-4 -O1 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I./RTE/Device/MDR1986BE1T-I./RTE/_Target_1-IC:/Users/nkulikov/AppData/Local/Arm/Packs/Keil/MDR1986BExx/2.0.3/Libraries/CMSIS/MDR32Fx/CoreSupport/CM1-IC:/Users/nkulikov/AppData/Local/Arm/Packs/Keil/MDR1986BExx/2.0.3/Libraries/CMSIS/MDR32Fx/DeviceSupport/MDR1986VE1T/inc-IC:/Users/nkulikov/AppData/Local/Arm/Packs/Keil/MDR1986BExx/2.0.3/Libraries/SPL/MDR32Fx/inc-D__UVISION_VERSION="536" -D_RTE_ -D_RTE_-o ./objects/tmr.o -MD)
 I (tmr.h)(0x66A34AE7)
 I (main.h)(0x670FB2C7)
@@ -141,7 +141,7 @@ I (C:\Users\nkulikov\AppData\Local\Arm\Packs\Keil\MDR1986BExx\2.0.3\Libraries\SP
 I (C:\Users\nkulikov\AppData\Local\Arm\Packs\Keil\MDR1986BExx\2.0.3\Libraries\SPL\MDR32Fx\inc\MDR32F9Qx_adc.h)(0x6114C5F2)
 I (port.h)(0x66976C5A)
 I (clk.h)(0x66976C5A)
-I (ethernet.h)(0x6716012D)
+I (ethernet.h)(0x67344B24)
 I (adc.h)(0x66D00799)
 I (spi.h)(0x67248568)
 F (.\tmr.h)(0x66A34AE7)()
@@ -169,12 +169,12 @@ I (C:\Users\nkulikov\AppData\Local\Arm\Packs\Keil\MDR1986BExx\2.0.3\Libraries\SP
 I (C:\Users\nkulikov\AppData\Local\Arm\Packs\Keil\MDR1986BExx\2.0.3\Libraries\SPL\MDR32Fx\inc\MDR32F9Qx_adc.h)(0x6114C5F2)
 I (port.h)(0x66976C5A)
 I (clk.h)(0x66976C5A)
-I (ethernet.h)(0x6716012D)
+I (ethernet.h)(0x67344B24)
 I (tmr.h)(0x66A34AE7)
 I (adc.h)(0x66D00799)
 I (spi.h)(0x67248568)
 F (.\adc.h)(0x66D00799)()
-F (.\spi.c)(0x6724C8F7)(-xc -std=gnu11 --target=arm-arm-none-eabi -mcpu=cortex-m1 -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -gdwarf-4 -O1 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I./RTE/Device/MDR1986BE1T-I./RTE/_Target_1-IC:/Users/nkulikov/AppData/Local/Arm/Packs/Keil/MDR1986BExx/2.0.3/Libraries/CMSIS/MDR32Fx/CoreSupport/CM1-IC:/Users/nkulikov/AppData/Local/Arm/Packs/Keil/MDR1986BExx/2.0.3/Libraries/CMSIS/MDR32Fx/DeviceSupport/MDR1986VE1T/inc-IC:/Users/nkulikov/AppData/Local/Arm/Packs/Keil/MDR1986BExx/2.0.3/Libraries/SPL/MDR32Fx/inc-D__UVISION_VERSION="536" -D_RTE_ -D_RTE_-o ./objects/spi.o -MD)
+F (.\spi.c)(0x6734A80B)(-xc -std=gnu11 --target=arm-arm-none-eabi -mcpu=cortex-m1 -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -gdwarf-4 -O1 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I./RTE/Device/MDR1986BE1T-I./RTE/_Target_1-IC:/Users/nkulikov/AppData/Local/Arm/Packs/Keil/MDR1986BExx/2.0.3/Libraries/CMSIS/MDR32Fx/CoreSupport/CM1-IC:/Users/nkulikov/AppData/Local/Arm/Packs/Keil/MDR1986BExx/2.0.3/Libraries/CMSIS/MDR32Fx/DeviceSupport/MDR1986VE1T/inc-IC:/Users/nkulikov/AppData/Local/Arm/Packs/Keil/MDR1986BExx/2.0.3/Libraries/SPL/MDR32Fx/inc-D__UVISION_VERSION="536" -D_RTE_ -D_RTE_-o ./objects/spi.o -MD)
 I (main.h)(0x670FB2C7)
 I (C:\Program Files\Keil_v5\ARM\ARMCLANG\include\stdbool.h)(0x60354E1A)
 I (C:\Program Files\Keil_v5\ARM\ARMCLANG\include\stdlib.h)(0x60354E20)
@@ -198,7 +198,7 @@ I (C:\Users\nkulikov\AppData\Local\Arm\Packs\Keil\MDR1986BExx\2.0.3\Libraries\SP
 I (C:\Users\nkulikov\AppData\Local\Arm\Packs\Keil\MDR1986BExx\2.0.3\Libraries\SPL\MDR32Fx\inc\MDR32F9Qx_adc.h)(0x6114C5F2)
 I (port.h)(0x66976C5A)
 I (clk.h)(0x66976C5A)
-I (ethernet.h)(0x6716012D)
+I (ethernet.h)(0x67344B24)
 I (tmr.h)(0x66A34AE7)
 I (adc.h)(0x66D00799)
 I (spi.h)(0x67248568)
